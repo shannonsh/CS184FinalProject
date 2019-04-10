@@ -32,12 +32,15 @@ Week 1
 - Create a design doc outlining how to implement all rendering techniques listed in our goals (cel shading, outlines, texture mapping)
 - Start implementing cel shading
 - Start implementing outlines
+
 Week 2
 - Finish implementing cel shading 
 - Finish implementing outlines
+
 Week 3
 - Implement texture mapping
 - Implement interactivity
+
 Week 4
 - Finish texture mapping
 - Finish implementing interactivity
@@ -45,8 +48,8 @@ Week 4
 
 
 # Resources
-- We will use [this](https://en.m.wikibooks.org/wiki/GLSL_Programming/Unity/Toon_Shading) as a guide for how to implement cel shading 
 - For starter code, we will start with the shader implemented in Project 4, part 5	
+- We will use [this](https://en.m.wikibooks.org/wiki/GLSL_Programming/Unity/Toon_Shading) as a guide for how to implement cel shading 
 - [Advanced Real-Time Cel Shading Techniques in OpenGL](https://www.cs.rpi.edu/~cutler/classes/advancedgraphics/S12/final_projects/hutchins_kim.pdf)
 - More in depth [research](https://raulreyesfinalproject.files.wordpress.com/2012/12/dissertation_cell-shading-raul_reyes_luque.pdf) into cel shading
 - Textbook [chapter](http://www.chrille.maps4vips.info/Archiv/FIN/NZ/COMPSCI715/Project/Tutorial.html) on cel shading
