@@ -1,0 +1,287 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+</script>
+
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+.column {
+  float: left;
+  width: 33.33%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+</style>
+<title>CS 184 Mesh Editor</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2019</h1>
+<h1 align="middle">Project 2: Mesh Editor</h1>
+<h2 align="middle">Gefen Kohavi</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>In this project, I implemented methods to deal with 3D meshes. First, I worked on 2D and 3D bezier curves to smoothly interpolate between points. Then I worked on surface normals to make smooth shading of meshes. Finally, I worked on mesh modification algorithms like half-edge flipping, edge splitting, and mesh upsampling. I learned a lot in this project and now understand why the half edge mesh data structure is so useful.</p>
+
+<h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
+
+<h3 align="middle">Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
+
+<p>De Casteljau's algorithm is used to implement Bezier curves. The algorithm happens as follows. First, given a list of vectors, we can add a level by taking a weighted sum of each pair of points that are consecutive in the list. The equation in this case is $(1-t)*p_i + t*p_{i+1}$ where t is between zero and one. This subdivition process can be repeated until there is only one point in the new list we have. This point is the point on the actual bezier curve.</p>
+
+<div class="row" align="middle">
+  <div class="column">
+    <img src="images/part1/part1_1.png" alt="Snow" style="width:100%">
+    <figcaption align="middle">Normal 6 control points</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part1/part1_2.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">1 Evaluation level</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part1/part1_3.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">2 Evaluation levels</figcaption>
+  </div>
+</div> 
+<div class="row" align="middle">
+  <div class="column">
+    <img src="images/part1/part1_4.png" alt="Snow" style="width:100%">
+    <figcaption align="middle">3 Evaluation levels</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part1/part1_5.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">4 Evaluation levels</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part1/part1_6.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">5 Evaluation levels</figcaption>
+  </div>
+</div> 
+<div class="row" align="middle">
+  <div class="column">
+    <img src="images/part1/part1_7.png" alt="Snow" style="width:100%">
+    <figcaption align="middle">t < .5</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part1/part1_8.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">t  &asymp; .5</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part1/part1_9.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">t > .5</figcaption>
+  </div>
+</div> 
+<div class="row" align="middle">
+  <img src="images/part1/part1_10.png" alt="Mountains" style="width:100%">
+  <figcaption align="middle">Another Bezier curve</figcaption>
+</div> 
+
+
+<h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
+
+<p> In this part, I extended the simple 1D bezier curve to 2D. This can simply be done on a 4x4 grid of 3D vertices by creating 4, 1D Bezier curves along one direction (like all rows) and then passing the points into a final 1D Bezier curve in the other direction (all columns) to get one final point. A lot of this part can reuse the 1D evaluation from part 1, basically we do 5 total 1d bezier evalutions.</p>
+
+<div class="row" align="middle">
+  <img src="images/part2/part2_1.png" alt="Mountains" style="width:100%">
+  <figcaption align="middle">Bezier curve teapot</figcaption>
+</div> 
+
+<h2 align="middle">Section II: Sampling</h2>
+
+<h3 align="middle">Part 3: Average normals for half-edge meshes</h3>
+
+<p> To smooth the faces of the mesh when doing shaing, we can compute the average surface normals of the neighboring vertices. To do this, we iterate using halfedges to get to the next vertex around the origin vertex via $h\rightarrow next()\rightarrow twin()$. We iterate until we get back to the start vertex. Because each vertex is a point and we want a vector, we subtract each vertex with is complement to get two vectors. We can then take the cross product to yield a normal vector. These vectors are already area weighted by definition of the cross product so we sum them and make it unit norm.</p>
+
+
+<div class="row" align="middle">
+    <img src="images/part3/part3_1.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">No smoothing</figcaption>
+    <img src="images/part3/part3_2.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">With average normals</figcaption>
+</div> 
+
+<h3 align="middle">Part 4: Half-edge flip</h3>
+
+<p>
+  Basicaly for half edge flip, we have to change the pointers for all of the half edges, vertices, and faces so that it is consistent with the flipped edge. Generally we don't have to change much for the half edges on the outside of the two triangles we are flipping.
+
+  There are 9 half-edges that need to be reassigned but also 2 faces, and 4 vertices that need their corresponding half edges to be reassigned.
+</p>
+
+<div class="row" align="middle">
+    <img src="images/part4/part4_1.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">Before flips</figcaption>
+    <img src="images/part4/part4_2.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">Lots of flips</figcaption>
+</div> 
+
+<h3 align="middle">Part 5: Half-edge split</h3>
+
+<p> 
+For half edge split, we need to create 3 new edges, 1 new vertex, 2 new faces, and 6 new half edges. We can then just reassing pointers to make the structure consistent that of two triangle that have been split. I used pencil and paper to make sure that my algorithm was right...
+
+
+<br></br>
+Basically for debugging, it ended up taking me two hours to find three misplaced pointer. I had to walk through each individual pointer assignment and after I found one that was misplaced I kept trying to run the code and see if it was working. Unfortunately it will just hang if it doesn't work so I knew for the first two times that I did something wrong.
+</p>
+
+<div class="row" align="middle">
+    <img src="images/part5/part5_1.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">Before splits</figcaption>
+    <img src="images/part5/part5_2.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">Lots of splits</figcaption>
+</div> 
+<div class="row" align="middle">
+    <img src="images/part5/part5_3.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">Before flips and splits</figcaption>
+    <img src="images/part5/part5_4.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">Lots of flips and splits</figcaption>
+</div> 
+
+
+<h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
+
+<p>
+  The process for mesh upsampling is as follows. First, I compute the new positions for all the old vertices by doing a weighted sum of the nigboring vertices. If $n=3$ (where n is the vertex degree), then the weights for the other vertices are $u=\frac{3}{16}$, otherwise the weights are $u=\frac{3}{8n}$. For the vertex we update, we weight the new position as $(1-n*u)$ the old position and sum all the values up. We store this new position in a temporary variable. We then update all the old edge midpoints to be a sum of $\frac{3}{8}$ of the 2 vertices on either end of the line and $\frac{1}{8}$ of the vertices at the end of the line if it was flipped. We also store this in a temporary variable. For both edges and vertices, we set is_new to be false and we also change the code for edge split to set is_new to be false for 1 edge (part of the old "edge") and is_new to be true for 2 new edges.
+  <br></br>
+  We then iterate over all of the edges we modified previously and split them, setting is_new to be true and putting the vertex position at the newly cacluated midpoint of the edges. We then flip all edges that are connected to both a old vertex and a new vertex. Finally we update all vertex positions using the temporary variable and set all is_new attributes to be false.
+</p>
+
+
+<div class="row" align="middle">
+  <div class="column">
+    <img src="images/part6/part6_1.png" alt="Snow" style="width:100%">
+    <figcaption align="middle">Normal cube</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_2.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">1 upsample</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_3.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">2 upsamples</figcaption>
+  </div>
+</div> 
+<div class="row" align="middle">
+  <div class="column">
+    <img src="images/part6/part6_4.png" alt="Snow" style="width:100%">
+    <figcaption align="middle">3 upsamples</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_5.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">4 upsamples</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_6.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">4 upsamples, rotated</figcaption>
+  </div>
+</div>
+
+<p>
+  As shown above, the result does not always divide symetrically, even when the original mesh shape is symetric. This happens because the mesh itself may not be symmtric. In the case of the cube, the corners that don't have face edges touching it usually become spiky whereas the other parts of the cube are smooth. This is caused by the fact that we are upsampling in some places that are smooth but then we do the same amount of upsampling in places that have a large change in distances. We can resolve this by splitting all edges on the cube so that each corner has 3 face edges touching it. 
+</p> 
+
+
+<div class="row" align="middle">
+  <div class="column">
+    <img src="images/part6/part6_7.png" alt="Snow" style="width:100%">
+    <figcaption align="middle">Cube with all face edges split</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_8.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">1 upsample</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_9.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">2 upsamples</figcaption>
+  </div>
+</div> 
+<div class="row" align="middle">
+  <div class="column">
+    <img src="images/part6/part6_10.png" alt="Snow" style="width:100%">
+    <figcaption align="middle">3 upsamples</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_11.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">4 upsamples</figcaption>
+  </div>
+</div> 
+
+<p> As seen, the results look a lot better and much more symmetrical. </p>
+<p> Extra examples below. It seems to be common that sharp corners and edges when upsampled still stay sharp, even when the rest of the mesh is smoothed. A simple solution to this is presplitting the edges around these sharp points before upsampling.</p>
+
+<div class="row" align="middle">
+  <div class="column">
+    <img src="images/part6/part6_12.png" alt="Snow" style="width:100%">
+    <figcaption align="middle">Original</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_13.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">1 upsample</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_14.png" alt="Mountains" style="width:100%">
+    <figcaption align="middle">Original</figcaption>
+  </div>
+</div> 
+<div class="row" align="middle">
+  <div class="column">
+    <img src="images/part6/part6_15.png" alt="Snow" style="width:100%">
+    <figcaption align="middle">1 upsample</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_16.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">2 upsamples</figcaption>
+  </div>
+  <div class="column" align="middle">
+    <img src="images/part6/part6_17.png" alt="Forest" style="width:100%">
+    <figcaption align="middle">3 upsamples</figcaption>
+  </div>
+</div> 
+
+<!-- Go no further than here!!! -->
+
+<h2 align="middle">Section III: Mesh Competition</h2>
+<p>If you are not participating in the optional mesh competition, don't worry about this section!</p>
+
+<h3 align="middle">Part 7: Design your own mesh!</h3>
+No designs here!!
+</body>
+</html>
