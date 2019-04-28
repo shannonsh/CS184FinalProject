@@ -220,7 +220,7 @@ class MeshEdit : public Renderer {
   void load( Scene* scene );
 
  private:
-
+  void mainGLSettings( void );
   void initializeStyle( void );
 
   // --  Private Variables.
@@ -239,6 +239,7 @@ class MeshEdit : public Renderer {
   size_t screen_h;
 
   GLuint shaderProgID;
+  GLuint outlineShader;
 
   bool shadingMode;
   bool smoothShading;
