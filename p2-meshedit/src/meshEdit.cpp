@@ -10,8 +10,8 @@ namespace CGL {
 
   void MeshEdit::init()
   {
-    smoothShading = false;
-    shadingMode = false;
+    smoothShading = true;
+    shadingMode = true;
     shaderProgID = loadShaders("../../shader/basic.vert", "../../shader/cel.frag");
     outlineShader = loadShaders("../../shader/outline.vert", "../../shader/outline.frag");
     text_mgr.init(use_hdpi);
@@ -31,7 +31,7 @@ namespace CGL {
     middle_down = false;
     mouse_rotate = false;
 
-    showHUD = true;
+    showHUD = false;
     camera_angles = Vector3D(0.0, 0.0, 0.0);
 
     mainGLSettings();
