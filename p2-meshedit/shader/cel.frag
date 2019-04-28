@@ -40,9 +40,6 @@ void main()
           else if (intensity > 0.25) color = vec3(0.4,0.2,0.2);
           else color = vec3(0.2,0.1,0.1);
           vec3 view_dir = eyePos - vertex.xyz;
-          if(abs(dot(view_dir, normal)) < 0.5) {
-            color = vec3(0, 0, 0);
-          }
 
 
         gl_FragColor.xyz = color;

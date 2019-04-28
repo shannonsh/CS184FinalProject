@@ -221,6 +221,7 @@ class MeshEdit : public Renderer {
 
  private:
   void mainGLSettings( void );
+  void outlineGLSettings( void );
   void initializeStyle( void );
 
   // --  Private Variables.

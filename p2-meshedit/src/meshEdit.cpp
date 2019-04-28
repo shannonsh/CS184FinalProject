@@ -13,6 +13,7 @@ namespace CGL {
     smoothShading = false;
     shadingMode = false;
     shaderProgID = loadShaders("../../shader/basic.vert", "../../shader/cel.frag");
+    outlineShader = loadShaders("../../shader/outline.vert", "../../shader/outline.frag");
     text_mgr.init(use_hdpi);
     text_color = Color(1.0, 1.0, 1.0);
 
@@ -83,6 +84,13 @@ namespace CGL {
     glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
     //glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
     glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
+  }
+  
+  void MeshEdit::outlineGLSettings( void )
+  {
+    glDisable(GL_LIGHTING);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
   }
 
   void MeshEdit::initializeStyle( void )
@@ -1227,6 +1235,13 @@ namespace CGL {
 
   void MeshEdit::renderMesh( HalfedgeMesh& mesh )
   {
+    // draw them outlines
+    glUseProgram(outlineShader);
+    outlineGLSettings();
+    drawFaces(mesh);
+    glEnable(GL_LIGHTING);
+    mainGLSettings();
+    
     if(shadingMode)
       glUseProgram(shaderProgID);
     else
