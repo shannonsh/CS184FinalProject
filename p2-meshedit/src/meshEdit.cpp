@@ -2,6 +2,10 @@
 #include "shaderUtils.h"
 #include "GL/glew.h"
 
+// Needed to generate stb_image binaries. Should only define in exactly one source file importing stb_image.h.
+#define STB_IMAGE_IMPLEMENTATION
+#include "misc/stb_image.h"
+
 #define PI 3.14159265
 
 #include <cmath>
@@ -14,6 +18,7 @@ namespace CGL {
     shadingMode = true;
     shaderProgID = loadShaders("../../shader/basic.vert", "../../shader/cel.frag");
     outlineShader = loadShaders("../../shader/outline.vert", "../../shader/outline.frag");
+    load_textures();
     text_mgr.init(use_hdpi);
     text_color = Color(1.0, 1.0, 1.0);
 
@@ -446,6 +451,61 @@ namespace CGL {
     }
 
     cerr << "Done loading scene. Mesh Ready for Editing!" << endl;
+  }
+  
+  Vector3D load_texture(int frame_idx, GLuint handle, const char* where) {
+    Vector3D size_retval;
+    
+    if (strlen(where) == 0) return size_retval;
+    
+    glActiveTexture(GL_TEXTURE0 + frame_idx);
+    glBindTexture(GL_TEXTURE_2D, handle);
+    
+    
+    int img_x, img_y, img_n;
+    unsigned char* img_data = stbi_load(where, &img_x, &img_y, &img_n, 3);
+    size_retval.x = img_x;
+    size_retval.y = img_y;
+    size_retval.z = img_n;
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
+    stbi_image_free(img_data);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    
+    return size_retval;
+  }
+  
+  void MeshEdit::load_textures( void ) {
+    glGenTextures(1, &m_gl_texture_1);
+    glGenTextures(1, &m_gl_texture_2);
+    glGenTextures(1, &m_gl_texture_3);
+    glGenTextures(1, &m_gl_texture_4);
+    glGenTextures(1, &m_gl_cubemap_tex);
+    
+    m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/texture_1.png").c_str());
+    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
+    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
+    m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
+    
+    std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size << std::endl;
+    std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
+    std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
+    std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
+    
+//    std::vector<std::string> cubemap_fnames = {
+//      m_project_root + "/textures/cube/posx.jpg",
+//      m_project_root + "/textures/cube/negx.jpg",
+//      m_project_root + "/textures/cube/posy.jpg",
+//      m_project_root + "/textures/cube/negy.jpg",
+//      m_project_root + "/textures/cube/posz.jpg",
+//      m_project_root + "/textures/cube/negz.jpg"
+//    };
+//
+//    load_cubemap(5, m_gl_cubemap_tex, cubemap_fnames);
+//    std::cout << "Loaded cubemap texture" << std::endl;
   }
 
   void MeshEdit::init_camera(Camera& camera)

@@ -222,6 +222,7 @@ class MeshEdit : public Renderer {
  private:
   void mainGLSettings( void );
   void outlineGLSettings( void );
+  void load_textures();
   void initializeStyle( void );
 
   // --  Private Variables.
@@ -241,6 +242,19 @@ class MeshEdit : public Renderer {
 
   GLuint shaderProgID;
   GLuint outlineShader;
+  
+  // OpenGL textures
+  std::string m_project_root = "../../";
+  Vector3D m_gl_texture_1_size;
+  Vector3D m_gl_texture_2_size;
+  Vector3D m_gl_texture_3_size;
+  Vector3D m_gl_texture_4_size;
+  GLuint m_gl_texture_1;
+  GLuint m_gl_texture_2;
+  GLuint m_gl_texture_3;
+  GLuint m_gl_texture_4;
+  GLuint m_gl_cubemap_tex;
+
 
   bool shadingMode;
   bool smoothShading;
