@@ -245,6 +245,7 @@ class MeshEdit : public Renderer {
 
   // Specify the location of eye and what it is pointing at.
   Vector3D view_focus;
+  Vector3D original_view_focus;
 
   enum e_up{X_UP, Y_UP, Z_UP};
   e_up up;
