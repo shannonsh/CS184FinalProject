@@ -12,10 +12,10 @@ namespace CGL {
   {
     smoothShading = false;
     shadingMode = false;
-    shaderProgID = loadShaders("shader/vert", "shader/frag");
+    shaderProgID = loadShaders("shader/basic.vert", "shader/depth.frag");
     if(!shaderProgID)
         cout << "here too" << endl;
-      shaderProgID = loadShaders("../../shader/vert", "../../shader/frag");
+    shaderProgID = loadShaders("../../shader/basic.vert", "../../shader/depth.frag");
     text_mgr.init(use_hdpi);
     text_color = Color(1.0, 1.0, 1.0);
 
@@ -69,6 +69,11 @@ namespace CGL {
     glEnable( GL_LINE_SMOOTH );
     //glEnable( GL_POLYGON_SMOOTH );
     glEnable(GL_POINT_SMOOTH);
+    
+    // cull backfaces for speed. Removes some UI stuff as a side effect tho
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    
     glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
     //glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
     glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);

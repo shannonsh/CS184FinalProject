@@ -1,0 +1,120 @@
+uniform int outputID;
+uniform vec3 eyePos;
+varying vec3 normal;
+varying vec3 vertex;
+
+#define PI 3.1415926
+
+vec3 shadeDiffuseFromEye();
+
+vec3 shadePhong(vec3 lightPos); // 10, 10, 10 is the light pos
+
+vec3 shadeEnvmapReflection();
+
+void main()
+{
+    if(outputID == 0)
+    {
+        gl_FragColor = vec4(shadeDiffuseFromEye(), 1.0);
+        return;
+    }
+    if(outputID == 1)
+    {
+        gl_FragColor = vec4(shadePhong(vec3(10, 10, 10)), 1.0);
+        return;
+    }
+    if(outputID == 2)
+    {
+        // Do something interesting here for extra credit.
+        // gl_FragColor = vec4(???, 1.0);
+        // return;
+      vec3 view_dir = eyePos - vertex.xyz;
+      float dist = length(view_dir) * length(view_dir)/64.0;
+      gl_FragColor = vec4(dist, dist, dist, 1.0);
+        return;
+    }
+  if(outputID == 2)
+  {
+    // Do something interesting here for extra credit.
+    // gl_FragColor = vec4(???, 1.0);
+    // return;
+//    vec3 view_dir = eyePos - vertex.xyz;
+//    float dist = length(view_dir) * length(view_dir)/64.0;
+    gl_FragColor = vec4(normal, 1.0);
+    return;
+  }
+}
+
+vec3 shadeDiffuseFromEye()
+{
+    vec3 n = normalize(normal);
+    vec3 out_vec = normalize(eyePos - vertex);
+    float diffuse = abs(dot(out_vec, n));
+    return vec3(diffuse);
+}
+
+vec3 shadePhong(vec3 lightPos)
+{
+    // TODO Part 7.
+    // TODO Compute Phong shading here. You can choose any color you like. But make
+    // TODO sure that you have noticeable specular highlights in the shading.
+    // TODO Variables to use: eyePos, lightPos, normal, vertex
+
+
+    ////////////////////////////////////////
+    // TODO: REMOVE BEFORE RELEASING.
+    ////////////////////////////////////////
+
+    // "Constants" to play with for coloring and lighting
+    float p = 10.0; // Used for specular shading
+    // vec3 lightColor = vec3(20.0 / 255.0, 200.0 / 255.0, 250.0 / 255.0);
+    vec3 lightColor = vec3(175.0 / 251.0, 200.0 / 255.0, 79.0 / 255.0);
+
+    // Useful vectors for shading, some normalized.
+    vec3 lightVec = lightPos - vertex;
+    vec3 lightDir = normalize(lightVec); // "l" in slides
+    vec3 outDir = normalize(eyePos - vertex); // "v" in slides
+    vec3 n = normalize(normal); // "n" in slides
+
+    // Compute the "1/r^2" term to simulate light intensity falling off as the light source moves further away
+    // distFactor is not used in this Phong shading since it makes the environment unusually dark; therefore, the factor is omitted entirely in the following equations
+    float distFactor = 1.0 / sqrt(dot(lightVec, lightVec));
+
+    // Ambient component
+    vec3 ambient = vec3(0.1, 0.1, 0.1);
+
+    // Diffuse component
+//    float diffuseDot = dot(n, lightDir);
+
+
+    // lightColor is "k_d"
+
+    // cel shading
+    float intensity = dot(lightDir,normalize(normal));
+    if (intensity > 0.4) intensity = 1.0;
+    else if (intensity > 0.3) intensity = 0.5;
+    else if (intensity > 0.2) intensity = 0.2;
+    else intensity = 0.1;
+
+    // add outline around object if camera perp to normal
+    vec3 view_dir = eyePos - vertex.xyz;
+    if(abs(dot(view_dir, normal)) < 0.4) {
+        intensity = 0.0;
+    }
+    vec3 diffuse = lightColor * clamp(intensity, 0.0, 1.0);
+
+    // Specular component
+    vec3 halfAngle = normalize(outDir + lightDir);
+    vec3 specularColor = min(lightColor + 0.5, 1.0);
+    float specularDot = dot(n, halfAngle);
+    // cel shading
+    if (specularDot > 0.99) specularDot = 1.0;
+    else if (specularDot > 0.5) specularDot = 0.3;
+    else if (specularDot > 0.25) specularDot = 0.05;
+    else specularDot = 0.01;
+    vec3 specular = specularColor * pow(clamp(specularDot, 0.0, 1.0), p);
+    // specularColor is "k_s"
+
+    // Phong shading is the summation of diffuse, ambient, and specular shading components.
+    return diffuse + ambient + specular;
+}
