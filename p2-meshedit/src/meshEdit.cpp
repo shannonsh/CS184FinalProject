@@ -12,6 +12,7 @@
 
 namespace CGL {
 
+
   void MeshEdit::init()
   {
     smoothShading = true;
@@ -105,7 +106,7 @@ namespace CGL {
     hoverStyle.halfedgeColor = Color( 0.9, 0.9, 0.9 );
     selectStyle.halfedgeColor = Color( 1.0, 1.0, 1.0 );
 
-    defaultStyle.faceColor = Color( 0.5, 0.50, 0.90 );
+    defaultStyle.faceColor = Color( 0.0, 0.50, 0.90 ); // HERE CUSTOM COLOR
     hoverStyle.faceColor = Color( 0.9, 0.75, 0.75 );
     selectStyle.faceColor = Color( 1.0, 1.00, 1.00 );
 
@@ -150,6 +151,7 @@ namespace CGL {
     glGetIntegerv( GL_VIEWPORT, view );
     resize( view[2], view[3] );
 
+
     // Control the camera to look at the mesh.
     glMatrixMode(GL_MODELVIEW);
 
@@ -180,6 +182,9 @@ namespace CGL {
         cx = v_x + view_distance*sin(camera_angles.x)*cos(camera_angles.y*.99);
         cy = v_y + view_distance*cos(camera_angles.x)*cos(camera_angles.y*.99);
         cz = v_z + view_distance*sin(camera_angles.y);
+        //cout << "Angles: " << camera_angles.x << " " << camera_angles.y << " " << camera_angles.z << endl;
+        //cout << "Positn: " << cx << " " << cy << " " << cz << endl;
+        //cout << "ViewFs: " << v_x << " " << v_y << " " << v_z << endl;
 
         break;
       default:
@@ -231,11 +236,11 @@ namespace CGL {
   }
 
   string MeshEdit::name() {
-    return "MeshEdit";
+    return "CelShader";
   }
 
   string MeshEdit::info() {
-    return "Assignment 2: MeshEdit";
+    return "Final Project: CelShader";
   }
 
   void MeshEdit::key_event( char key )
@@ -266,8 +271,8 @@ namespace CGL {
       case 'F':
         flipSelectedEdge();
         break;
-      case 's':
-      case 'S':
+      case 'z':
+      case 'Z':
         splitSelectedEdge();
         break;
       case 'n':
@@ -278,14 +283,53 @@ namespace CGL {
       case 'T':
         selectTwinHalfedge();
         break;
-      case 'w':
-      case 'W':
+      case 'r':
+      case 'R':
         shadingMode = !shadingMode;
         break;
       case 'q':
       case 'Q':
         smoothShading = !smoothShading;
         break;
+      case 'w':
+      case 'W':
+        //printf("%s\n", "move up");
+        view_focus += Vector3D(0, 0, -1);
+        update_camera();
+        break;
+      case 'a':
+      case 'A':
+        //printf("%s\n", "move left");
+
+        view_focus += Vector3D(-1, 0, 0);
+        update_camera();
+        break;
+      case 's':
+      case 'S':
+        //printf("%s\n", "move down");
+        view_focus += Vector3D(0, 0, 1);
+        
+        update_camera();
+        break;
+      case 'd':
+      case 'D':
+        //printf("%s\n", "move right");
+        view_focus += Vector3D(1, 0, 0);
+        update_camera();
+        break;
+      case '=':
+        //printf("%s\n", "move z+");
+       //view_focus += Vector3D(0, -1, 0);
+        scroll_event( 0, 1);
+        update_camera();
+        break;
+      case '-':
+        //printf("%s\n", "move z-");
+        //view_focus += Vector3D(0, 1, 0);
+        scroll_event( 0, -1);
+        update_camera();
+
+        
       default:
         break;
     }
@@ -520,6 +564,7 @@ namespace CGL {
   {
     view_distance = canonical_view_distance*2.0;
     camera_angles = Vector3D(0., 0., 0.);
+    view_focus = original_view_focus;
   }
 
   void MeshEdit::init_light(Light& light)
@@ -598,7 +643,9 @@ namespace CGL {
     max_view_distance = canonical_view_distance*20.;
 
     camera_angles = Vector3D(0., 0., 0.);
-    view_focus    = centroid;
+    view_focus    = centroid ;
+    original_view_focus = view_focus;
+    //cout << view_focus << endl;
     up = Z_UP;
   }
 
@@ -650,6 +697,7 @@ namespace CGL {
   void MeshEdit::mouseD(float x, float y)
   {
     // Rotate the camera when the left mouse button is dragged.
+
     float dx = (x - mouse_x);
     float dy = (y - mouse_y);
 
@@ -667,18 +715,70 @@ namespace CGL {
 
     if(mouse_rotate)
     {
+      
       double & cx = camera_angles.x;
       double & cy = camera_angles.y;
 
-      cx += dx*2*PI/screen_w;
-      cy += dy*  PI/screen_h;
+      double alpha_x = dx * 2 * PI / screen_w;
+      double alpha_y = dy * PI / screen_h;
+
+      double vector_x_0[] = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+      double vector_x_1[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+      double vector_x_2[] = {0.0,-1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+      Vector4D initial_view_focus = Vector4D(view_focus.x, view_focus.y, view_focus.z, 1);
+
+      double t_data[] = {
+        1.0, 0.0, 0.0, -initial_view_focus.x,
+        0.0, 1.0, 0.0, -initial_view_focus.y,
+        0.0, 0.0, 1.0, -initial_view_focus.z,
+        0.0, 0.0, 0.0, 1.0,
+      };
+      double t1_data[] = {
+        1.0, 0.0, 0.0, initial_view_focus.x,
+        0.0, 1.0, 0.0, initial_view_focus.y,
+        0.0, 0.0, 1.0, initial_view_focus.z,
+        0.0, 0.0, 0.0, 1.0,
+      };
+      double rz_data[] = {
+        cos(alpha_x),-sin(alpha_x), 0.0, 0.0,
+        sin(alpha_x), cos(alpha_x), 0.0, 0.0,
+                 0.0,          0.0, 1.0, 0.0,
+                 0.0,          0.0, 0.0, 1.0,
+      };
+
+      Matrix4x4 T = Matrix4x4(t_data);
+      Matrix4x4 T1 = Matrix4x4(t1_data);
+      Matrix4x4 Rz = Matrix4x4(rz_data);
+
+      Vector4D x_transform_view_focus = T1 * Rz * T * initial_view_focus;
+      view_focus.x = x_transform_view_focus.x;
+      view_focus.y = x_transform_view_focus.y;
+      view_focus.z = x_transform_view_focus.z;
+
+      cx += alpha_x;
+      // Matrix3x3 x_transform = cos(alpha_x) * Matrix3x3(vector_x_0);
+      // x_transform += (1.0 - cos(alpha_x)) * Matrix3x3(vector_x_1);
+      // x_transform += sin(alpha_x) * Matrix3x3(vector_x_2);
+
+      // cout << x_transform << endl;
+      // view_focus = x_transform * view_focus;
+
+      // cy += alpha_y;
+
 
       // Users can freely rotate the model's as much as they
       // want in the horizontal direction.
-      cx = cx >= 0 ? min(cx, cx - 2*PI) : (cx + 2*PI);
+      if (cx >= 2 * PI) {
+        cx -= 2 * PI;
+      } else if (cx < 0) {
+        cx += 2 * PI;
+      }
+      // cx = cx >= 0 ? min(cx, cx - 2*PI) : (cx + 2*PI);
 
       // Bound the vertical view angle.
       camera_angles.y = bound(camera_angles.y, -PI/2, PI/2);
+      
     }
   }
 
