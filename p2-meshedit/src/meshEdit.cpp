@@ -294,39 +294,39 @@ namespace CGL {
       case 'w':
       case 'W':
         //printf("%s\n", "move up");
-        view_focus += Vector3D(0, 0, -1);
+        view_focus += Vector3D(0, 0, -0.5);
         update_camera();
         break;
       case 'a':
       case 'A':
         //printf("%s\n", "move left");
 
-        view_focus += Vector3D(-1, 0, 0);
+        view_focus += Vector3D(-0.5, 0, 0);
         update_camera();
         break;
       case 's':
       case 'S':
         //printf("%s\n", "move down");
-        view_focus += Vector3D(0, 0, 1);
+        view_focus += Vector3D(0, 0, 0.5);
         
         update_camera();
         break;
       case 'd':
       case 'D':
         //printf("%s\n", "move right");
-        view_focus += Vector3D(1, 0, 0);
+        view_focus += Vector3D(0.5, 0, 0);
         update_camera();
         break;
       case '=':
         //printf("%s\n", "move z+");
        //view_focus += Vector3D(0, -1, 0);
-        scroll_event( 0, 1);
+        scroll_event( 0, 0.5);
         update_camera();
         break;
       case '-':
         //printf("%s\n", "move z-");
         //view_focus += Vector3D(0, 1, 0);
-        scroll_event( 0, -1);
+        scroll_event( 0, -0.5);
         update_camera();
 
         
@@ -716,7 +716,7 @@ namespace CGL {
     if(mouse_rotate)
     {
       
-      double & cx = camera_angles.x;
+      /*double & cx = camera_angles.x;
       double & cy = camera_angles.y;
 
       double alpha_x = dx * 2 * PI / screen_w;
@@ -775,6 +775,20 @@ namespace CGL {
         cx += 2 * PI;
       }
       // cx = cx >= 0 ? min(cx, cx - 2*PI) : (cx + 2*PI);
+
+      // Bound the vertical view angle.
+      camera_angles.y = bound(camera_angles.y, -PI/2, PI/2);*/
+
+      double & cx = camera_angles.x;
+
+      double & cy = camera_angles.y;
+
+      cx += dx*2*PI/screen_w;
+      cy += dy*  PI/screen_h;
+
+      // Users can freely rotate the model's as much as they
+      // want in the horizontal direction.
+      cx = cx >= 0 ? min(cx, cx - 2*PI) : (cx + 2*PI);
 
       // Bound the vertical view angle.
       camera_angles.y = bound(camera_angles.y, -PI/2, PI/2);
