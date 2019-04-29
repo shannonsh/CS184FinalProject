@@ -164,9 +164,9 @@ namespace CGL {
         cx = v_x + view_distance*sin(camera_angles.x)*cos(camera_angles.y*.99);
         cy = v_y + view_distance*cos(camera_angles.x)*cos(camera_angles.y*.99);
         cz = v_z + view_distance*sin(camera_angles.y);
-        cout << "Angles: " << camera_angles.x << " " << camera_angles.y << " " << camera_angles.z << endl;
-        cout << "Positn: " << cx << " " << cy << " " << cz << endl;
-        cout << "ViewFs: " << v_x << " " << v_y << " " << v_z << endl;
+        //cout << "Angles: " << camera_angles.x << " " << camera_angles.y << " " << camera_angles.z << endl;
+        //cout << "Positn: " << cx << " " << cy << " " << cz << endl;
+        //cout << "ViewFs: " << v_x << " " << v_y << " " << v_z << endl;
 
         break;
       default:
@@ -653,7 +653,7 @@ namespace CGL {
       double vector_x_1[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
       double vector_x_2[] = {0.0,-1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-      Vector4D initial_view_focus = Vector4D(old_view_focus.x, old_view_focus.y, old_view_focus.z, 1);
+      Vector4D initial_view_focus = Vector4D(view_focus.x, view_focus.y, view_focus.z, 1);
 
       double t_data[] = {
         1.0, 0.0, 0.0, -initial_view_focus.x,
