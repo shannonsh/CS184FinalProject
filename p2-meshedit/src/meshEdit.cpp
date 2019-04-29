@@ -11,12 +11,10 @@ namespace CGL {
 
   void MeshEdit::init()
   {
-    smoothShading = false;
-    shadingMode = false;
-    shaderProgID = loadShaders("shader/vert", "shader/frag");
-    if(!shaderProgID)
-        //cout << "here too" << endl;
-      shaderProgID = loadShaders("../../shader/vert", "../../shader/frag");
+    smoothShading = true;
+    shadingMode = true;
+    shaderProgID = loadShaders("../../shader/basic.vert", "../../shader/cel.frag");
+    outlineShader = loadShaders("../../shader/outline.vert", "../../shader/outline.frag");
     text_mgr.init(use_hdpi);
     text_color = Color(1.0, 1.0, 1.0);
 
@@ -34,19 +32,28 @@ namespace CGL {
     middle_down = false;
     mouse_rotate = false;
 
-    showHUD = true;
+    showHUD = false;
     camera_angles = Vector3D(0.0, 0.0, 0.0);
 
+    mainGLSettings();
+
+    // Initialize styles (colors, line widths, etc.) that will be used
+    // to draw different types of mesh elements in various situations.
+    initializeStyle();
+  }
+  
+  void MeshEdit::mainGLSettings( void )
+  {
     // 3D applications really like enabling the depth test,
     // this allows triangles that are closer to be drawn in
     // front of triangles that are farther away.
     /* Use depth buffering for hidden surface elimination. */
     glEnable(GL_DEPTH_TEST);
-
+    
     // FIXME!
     // -- Setup some temporary working lights for now and resolve
     // -- the input light configurations later.
-
+    
     // Red diffuse light.//.4
     GLfloat light_diffuse[] = {1.0, 1.0, 1.0, 1.0};
     GLfloat light_ambient[] = {.2, .2, .2, 1.0};
@@ -60,25 +67,31 @@ namespace CGL {
     glLightfv(GL_LIGHT0, GL_POSITION, light_position);
     glEnable(GL_LIGHT0);
     light_num++; // increment the number of lights currently turned on
-
+    
     // Lighting needs to be explicitly enabled.
     glEnable(GL_LIGHTING);
-
+    
     // Enable antialiasing and circular points.
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable( GL_LINE_SMOOTH );
     //glEnable( GL_POLYGON_SMOOTH );
     glEnable(GL_POINT_SMOOTH);
+    
+    // cull backfaces for speed. Removes some UI stuff as a side effect tho
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    
     glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
     //glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
     glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
-
-
-
-    // Initialize styles (colors, line widths, etc.) that will be used
-    // to draw different types of mesh elements in various situations.
-    initializeStyle();
+  }
+  
+  void MeshEdit::outlineGLSettings( void )
+  {
+    glDisable(GL_LIGHTING);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
   }
 
   void MeshEdit::initializeStyle( void )
@@ -1322,6 +1335,13 @@ namespace CGL {
 
   void MeshEdit::renderMesh( HalfedgeMesh& mesh )
   {
+    // draw them outlines
+    glUseProgram(outlineShader);
+    outlineGLSettings();
+    drawFaces(mesh);
+    glEnable(GL_LIGHTING);
+    mainGLSettings();
+    
     if(shadingMode)
       glUseProgram(shaderProgID);
     else
