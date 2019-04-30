@@ -5,9 +5,13 @@
 [![Video](http://img.youtube.com/vi/ruxaztOYne0/0.jpg)](https://www.youtube.com/watch?v=ruxaztOYne0)
 
 ## Finished tasks
-So far we have implemented two styles of shading: Blinn Phong (has multiple layers of shadow and a highlight layer), and diffuse shading (multiple layers of shadow and no highlight). We have accomplished n level shading, as in n different layers of shadows can be added to the model, but this has to be done programatically, and the user cannot decide the levels of shadow themselves. (image here)
+So far we have implemented two styles of shading: Blinn Phong (has multiple layers of shadow and a highlight layer), and diffuse shading (multiple layers of shadow and no highlight). We have accomplished n level shading, as in n different layers of shadows can be added to the model, but this has to be done programatically, and the user cannot decide the levels of shadow themselves. 
 
+![blinn phong](images/progress-report/blinnphong.png)
 
+![diffuse](images/progress-report/diffuse.png)
+
+We've also started implementing basic interactivity, with the ability to move the camera perspective up, down, left, and right in the project 2 GUI. It isn't fully compatible with the camera rotation in project 2 yet, however, as the axis of rotation hasn't changed from the former centroid of the model.
 
 ## Preliminary Results
 
