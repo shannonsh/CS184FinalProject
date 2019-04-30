@@ -1,5 +1,7 @@
 # Progress Report
 
+**Video link:** 
+
 [![Video](http://img.youtube.com/vi/ruxaztOYne0/0.jpg)](https://www.youtube.com/watch?v=ruxaztOYne0)
 
 ## Finished tasks
