@@ -2,7 +2,7 @@
 
 **Video link:** 
 
-[![Video](http://img.youtube.com/vi/ruxaztOYne0/0.jpg)](https://www.youtube.com/watch?v=ruxaztOYne0)
+[![Video](http://img.youtube.com/vi/idY7LwT-TzY/0.jpg)](https://www.youtube.com/watch?v=idY7LwT-TzY)
 
 ## Finished tasks
 So far we have implemented two styles of shading: Blinn Phong (has multiple layers of shadow and a highlight layer), and diffuse shading (multiple layers of shadow and no highlight). We have accomplished n level shading, as in n different layers of shadows can be added to the model, but this has to be done programatically, and the user cannot decide the levels of shadow themselves. 
@@ -37,4 +37,16 @@ Textures and interactivity turned out to be more complicated to implement than w
 
 ## Updated Plan
 
-Although we were told that we might finish our main goals with enough time to finish all of our stretch goals, we think we will not be able to finish all of our stretch goals before the end of the project. However, we should be able to finish all of our main goals along with one or two stretch goals. 
+Although we were told that we might finish our main goals with enough time to finish all of our stretch goals, we think we will not be able to finish all of our stretch goals before the end of the project. However, we should be able to finish all of our main goals along with one or two stretch goals. Our updated schedule is below:
+
+Week 3
+
+* Finish implementing texture mapping
+* Start implementing cross hatching
+
+Week 4
+
+* Finish implementing cross hatching
+* Finish implementing interactivity
+* If we still have time, implement techniques listed under Stretch Goals
+
