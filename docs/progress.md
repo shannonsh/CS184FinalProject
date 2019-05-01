@@ -4,7 +4,7 @@
 
 [![Video](http://img.youtube.com/vi/idY7LwT-TzY/0.jpg)](https://www.youtube.com/watch?v=idY7LwT-TzY)
 
-** Slides **
+**Slides**
 
 [Slides](https://docs.google.com/presentation/d/1koAZuEo0fWr01861KqCORCwR0_fiAw3VNkBIwQIoSpk/edit?usp=sharing)
 
