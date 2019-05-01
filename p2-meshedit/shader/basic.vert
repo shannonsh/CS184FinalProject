@@ -6,7 +6,7 @@ varying vec2 uv;
 
 void main()
 {
-  uv = gl_MultiTexCoord0.xy;
+    uv = gl_Vertex.xy;//gl_MultiTexCoord0.xy;
 //    v_texCoord = texCoord;
   
     vertex = gl_Vertex.xyz;
