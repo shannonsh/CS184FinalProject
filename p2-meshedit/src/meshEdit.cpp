@@ -503,7 +503,7 @@ namespace CGL {
     if (strlen(where) == 0) return size_retval;
     
     glActiveTexture(GL_TEXTURE0 + frame_idx);
-    glBindTexture(GL_TEXTURE_2D, handle);
+    glBindTexture(GL_TEXTURE, handle);
     
     
     int img_x, img_y, img_n;
@@ -524,20 +524,20 @@ namespace CGL {
   
   void MeshEdit::load_textures( void ) {
     glGenTextures(1, &m_gl_texture_1);
-    glGenTextures(1, &m_gl_texture_2);
-    glGenTextures(1, &m_gl_texture_3);
-    glGenTextures(1, &m_gl_texture_4);
-    glGenTextures(1, &m_gl_cubemap_tex);
+//    glGenTextures(1, &m_gl_texture_2);
+//    glGenTextures(1, &m_gl_texture_3);
+//    glGenTextures(1, &m_gl_texture_4);
+//    glGenTextures(1, &m_gl_cubemap_tex);
     
     m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/texture_1.png").c_str());
-    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
-    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
-    m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
+//    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
+//    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
+//    m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
     
     std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size << std::endl;
-    std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
-    std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
-    std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
+//    std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
+//    std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
+//    std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
     
 //    std::vector<std::string> cubemap_fnames = {
 //      m_project_root + "/textures/cube/posx.jpg",
@@ -1412,7 +1412,7 @@ namespace CGL {
     // draw them outlines
     glUseProgram(outlineShader);
     outlineGLSettings();
-    drawFaces(mesh);
+    drawFaces(mesh, true);
     glEnable(GL_LIGHTING);
     mainGLSettings();
     
@@ -1421,7 +1421,7 @@ namespace CGL {
     else
       glUseProgram(0);
     glEnable(GL_LIGHTING);
-    drawFaces( mesh );
+    drawFaces( mesh, false );
     glDisable(GL_LIGHTING);
 
     glUseProgram(0);
@@ -1461,9 +1461,26 @@ namespace CGL {
     cerr << "Warning: draw style not defined for current mesh element!" << endl;
   }
 
-  void MeshEdit::drawFaces( HalfedgeMesh& mesh )
+  void MeshEdit::drawFaces( HalfedgeMesh& mesh, bool noDetail )
   {
-
+    // pass variables into shader
+    if(!noDetail) {
+      // textures
+      glUniform1i(glGetUniformLocation(shaderProgID, "u_texture_1"), 1);
+//      float texCoords[] = {
+//        0.0f, 0.0f,
+//        1.0f, 0.0f
+//      };
+      glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+      glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+//      glTexGenfv(GL_S, GL_OBJECT_PLANE, texCoords);
+//      glTexGenfv(GL_T, GL_OBJECT_PLANE, texCoords);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//      glUniform3fv(glGetUniformLocation(shaderProgID, "in_uv"),
+//                   1, texCoords);
+    }
+    
     for( FaceIter f = mesh.facesBegin(); f != mesh.facesEnd(); f++ )
     {
 

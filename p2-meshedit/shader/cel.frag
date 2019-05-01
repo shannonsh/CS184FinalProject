@@ -1,7 +1,14 @@
 uniform int outputID;
 uniform vec3 eyePos;
+
+uniform sampler2D u_texture_1;
+//vec2 in_uv;
+
+
 varying vec3 normal;
 varying vec3 vertex;
+
+varying vec2 uv;
 
 #define PI 3.1415926
 
@@ -71,7 +78,8 @@ vec3 shadePhong(vec3 lightPos)
     // "Constants" to play with for coloring and lighting
     float p = 10.0; // Used for specular shading
     // vec3 lightColor = vec3(20.0 / 255.0, 200.0 / 255.0, 250.0 / 255.0);
-    vec3 lightColor = vec3(175.0 / 251.0, 200.0 / 255.0, 79.0 / 255.0);
+//    vec3 lightColor = vec3(175.0 / 251.0, 200.0 / 255.0, 79.0 / 255.0);
+  vec3 lightColor = texture2D(u_texture_1, uv).xyz;
 
     // Useful vectors for shading, some normalized.
     vec3 lightVec = lightPos - vertex;
@@ -89,9 +97,6 @@ vec3 shadePhong(vec3 lightPos)
     // Diffuse component
 //    float diffuseDot = dot(n, lightDir);
 
-
-    // lightColor is "k_d"
-
     // cel shading
     float intensity = dot(lightDir,normalize(normal));
     if (intensity > 0.4) intensity = 1.0;
@@ -101,9 +106,9 @@ vec3 shadePhong(vec3 lightPos)
 
     // add outline around object if camera perp to normal
     vec3 view_dir = eyePos - vertex.xyz;
-    if(abs(dot(view_dir, normal)) < 0.4) {
-        intensity = 0.0;
-    }
+//    if(abs(dot(view_dir, normal)) < 0.4) {
+//      intensity = 0.0;
+//    }
     vec3 diffuse = lightColor * clamp(intensity, 0.0, 1.0);
 
     // Specular component

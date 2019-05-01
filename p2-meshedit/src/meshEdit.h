@@ -297,7 +297,7 @@ class MeshEdit : public Renderer {
 
   // Rendering functions.
   void renderMesh   ( HalfedgeMesh& mesh );
-  void drawFaces    ( HalfedgeMesh& mesh );
+  void drawFaces    ( HalfedgeMesh& mesh, bool noDetail );
   void drawEdges    ( HalfedgeMesh& mesh );
   void drawVertices ( HalfedgeMesh& mesh );
   void drawHalfedges( HalfedgeMesh& mesh );
