@@ -12,6 +12,6 @@ void main()
   
     vertex = gl_Vertex.xyz;
     normal = gl_Normal.xyz;
-    vertexColor = gl_vertexColor.xyz;
+    //vertexColor = gl_vertexColor.xyz;
     gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
