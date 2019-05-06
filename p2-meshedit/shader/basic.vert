@@ -6,8 +6,9 @@ varying vec2 uv;
 
 void main()
 {
-    uv = gl_Vertex.xy;//gl_MultiTexCoord0.xy;
-//    v_texCoord = texCoord;
+    uv = gl_Vertex.xy;
+    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+//    gl_TexCoord[0] = gl_MultiTexCoord0;
   
     vertex = gl_Vertex.xyz;
     normal = gl_Normal.xyz;

@@ -27,7 +27,7 @@ void main()
     }
     if(outputID == 1)
     {
-        gl_FragColor = vec4(shadePhong(vec3(10, 10, 10)), 1.0);
+        gl_FragColor = vec4(shadePhong(vec3(10, -10, 10)), 1.0);
         return;
     }
     if(outputID == 2)
@@ -79,7 +79,7 @@ vec3 shadePhong(vec3 lightPos)
     float p = 10.0; // Used for specular shading
     // vec3 lightColor = vec3(20.0 / 255.0, 200.0 / 255.0, 250.0 / 255.0);
 //    vec3 lightColor = vec3(175.0 / 251.0, 200.0 / 255.0, 79.0 / 255.0);
-  vec3 lightColor = texture2D(u_texture_1, uv).xyz;
+  vec3 lightColor = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
 
     // Useful vectors for shading, some normalized.
     vec3 lightVec = lightPos - vertex;
