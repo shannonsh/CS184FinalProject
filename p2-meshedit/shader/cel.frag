@@ -18,6 +18,8 @@ vec3 shadePhong(vec3 lightPos);
 
 vec3 shadeEnvmapReflection();
 
+vec3 vertexColor;
+
 void main()
 {
     if(outputID == 0)
@@ -52,6 +54,25 @@ void main()
         gl_FragColor.xyz = color;
         gl_FragColor.a = 1.0;
 	    return;
+    }
+    if(outputID == 3)
+    //DAE color here
+    {
+    vec3 v_position3 = vertex.xyz;
+  
+          float intensity;
+          vec3 color = vertexColor;
+          vec3 lightDir = vec3(10.0,10.0,10.0) - v_position3;
+          intensity = dot(lightDir,normalize(normal));
+          if (intensity > 0.95) color += vec3(1.0,0.5,0.5);
+          else if (intensity > 0.5) color += vec3(0.6,0.3,0.3);
+          else if (intensity > 0.25) color += vec3(0.4,0.2,0.2);
+          vec3 view_dir = eyePos - vertex.xyz;
+
+
+        gl_FragColor.xyz = vertexColor;
+        gl_FragColor.a = 1.0;
+        return;
     }
 }
 

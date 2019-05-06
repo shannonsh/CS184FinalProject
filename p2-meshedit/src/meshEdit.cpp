@@ -533,6 +533,7 @@ namespace CGL {
 //    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
 //    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
 //    m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
+
     
     std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size << std::endl;
 //    std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
@@ -704,6 +705,8 @@ namespace CGL {
     Vertex* v = NULL;
     if (selectedFeature.isValid()) {
       v = selectedFeature.element->getVertex();
+      cout << v;
+
     }
 
     if(!mouse_rotate && v != NULL)
@@ -1509,6 +1512,9 @@ namespace CGL {
         if(smoothShading)
           normal = h->vertex()->normal();
         glNormal3dv( &normal.x );
+          float color[] = {1,1,1};
+        glUniform3fv(glGetUniformLocation(shaderProgID, "vertexColor"), 1, color);
+
         // Draw this vertex.
         Vector3D position = h->vertex()->position;
         glVertex3dv( &position.x );
