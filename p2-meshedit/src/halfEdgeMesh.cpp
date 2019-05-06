@@ -388,7 +388,8 @@ namespace CGL {
 
         // set the position of this vertex to the corresponding position in the input
         v->position = vertexPositions[ i ];
-        v->texcoord = texcoords[i];
+        if(i < texcoords.size())
+          v->texcoord = texcoords[i];
         i++;
       }
 
