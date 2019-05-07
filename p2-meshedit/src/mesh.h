@@ -22,6 +22,8 @@ namespace CGL {
     std::string id;
     std::string name;
 
+    Matrix4x4 modelView;
+    
     std::vector<Vector3D> vertices;   ///< polygon vertex array
     std::vector<Vector3D> normals;    ///< polygon normal array
     std::vector<Vector2D> texcoords;  ///< texture coordinate array

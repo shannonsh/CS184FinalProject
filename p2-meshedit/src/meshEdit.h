@@ -139,7 +139,7 @@ namespace CGL {
                polygons.push_back( p->vertex_indices );
             }
            
-            mesh.build( polygons, polyMesh.vertices, polyMesh.texcoords ); // HELLO THERE
+            mesh.build( polygons, polyMesh.vertices, polyMesh.texcoords, polyMesh.modelView  );
          }
 
          // Destructor --- this destructor shouldn't be needed according to the

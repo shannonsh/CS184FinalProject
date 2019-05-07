@@ -330,6 +330,7 @@ namespace CGL {
         XMLElement* e_geometry = find_instance( e_geometries, geometry_id );
         if ( e_geometry ) {
           Polymesh* polymesh = new Polymesh();
+          polymesh->modelView = node.transform;
           parsePolymesh( e_geometry, *polymesh );
           node.instance = polymesh;
         } else {

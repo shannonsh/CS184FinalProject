@@ -33,7 +33,7 @@ namespace CGL {
   }
 
   void HalfedgeMesh :: build( const vector< vector<Index> >& polygons,
-    const vector<Vector3D>& vertexPositions, const vector<Vector2D>& texcoords )
+    const vector<Vector3D>& vertexPositions, const vector<Vector2D>& texcoords, Matrix4x4 modelViewMat )
     // This method initializes the halfedge data structure from a raw list of polygons,
     // where each input polygon is specified as a list of vertex indices.  The input
     // must describe a manifold, oriented surface, where the orientation of a polygon
@@ -395,6 +395,7 @@ namespace CGL {
         }
         i++;
       }
+      modelView = modelViewMat;
 
     } // end HalfedgeMesh::build()
 
@@ -443,7 +444,8 @@ namespace CGL {
       for(   EdgeIter e =      edgesBegin(); e !=      edgesEnd(); e++ ) e->halfedge() = halfedgeOldToNew[ e->halfedge() ];
       for(   FaceIter f =      facesBegin(); f !=      facesEnd(); f++ ) f->halfedge() = halfedgeOldToNew[ f->halfedge() ];
       for(   FaceIter b = boundariesBegin(); b != boundariesEnd(); b++ ) b->halfedge() = halfedgeOldToNew[ b->halfedge() ];
-
+      
+      this->modelView = Matrix4x4(mesh.modelView);
       // Return a reference to the new mesh.
       return *this;
     }
