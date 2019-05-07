@@ -33,7 +33,7 @@ namespace CGL {
   }
 
   void HalfedgeMesh :: build( const vector< vector<Index> >& polygons,
-    const vector<Vector3D>& vertexPositions )
+    const vector<Vector3D>& vertexPositions, const vector<Vector2D>& texcoords )
     // This method initializes the halfedge data structure from a raw list of polygons,
     // where each input polygon is specified as a list of vertex indices.  The input
     // must describe a manifold, oriented surface, where the orientation of a polygon
@@ -388,6 +388,8 @@ namespace CGL {
 
         // set the position of this vertex to the corresponding position in the input
         v->position = vertexPositions[ i ];
+        if(i < texcoords.size())
+          v->texcoord = texcoords[i];
         i++;
       }
 

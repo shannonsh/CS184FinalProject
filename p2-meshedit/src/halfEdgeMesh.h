@@ -430,7 +430,8 @@ namespace CGL
 
          Vector3D newPosition; ///< For Loop subdivision, this will be the updated position of the vertex
          bool isNew; ///< For Loop subdivision, this flag should be true if and only if this vertex is a new vertex created by subdivision (i.e., if it corresponds to a vertex of the original mesh)
-
+         Vector2D texcoord;
+     
          /**
           * computes the average of the neighboring vertex positions and stores it in Vertex::centroid
           */
@@ -559,7 +560,7 @@ namespace CGL
           * The input must describe a manifold, oriented surface, where the orientation of
           * a polygon is determined by the order of vertices in the list.
           */
-         void build( const vector< vector<Index> >& polygons, const vector<Vector3D>& vertexPositions );
+         void build( const vector< vector<Index> >& polygons, const vector<Vector3D>& vertexPositions, const vector<Vector2D>& texcoords );
 
          // These methods return the total number of elements of each type.
          Size nHalfedges  ( void ) const { return  halfedges.size(); } ///< get the number of halfedges

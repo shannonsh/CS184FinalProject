@@ -10,6 +10,10 @@
 
 #include <cmath>
 
+Color ambient;
+Color specular;
+Color diffuse;
+
 namespace CGL {
 
 
@@ -198,11 +202,19 @@ namespace CGL {
         up_x, up_y, up_z);// up direction.
 
     float eyePos[] = {cx, cy, cz};
-
     glUseProgram(shaderProgID);
     glUniform3fv(glGetUniformLocation(shaderProgID, "eyePos"),
         1, eyePos);
     glUniform1i(glGetUniformLocation(shaderProgID, "envmap"), 1);
+      
+    //sets ambient, specular, diffuse colors from model
+    float colordiffuse[] = {diffuse.r,diffuse.g,diffuse.b};
+    float colorspecular[] = {specular.r, specular.g, specular.b};
+    float colorambient[] = {ambient.r, ambient.g, ambient.b};
+
+    glUniform3fv(glGetUniformLocation(shaderProgID, "diffuseColor"), 1, colordiffuse);
+    glUniform3fv(glGetUniformLocation(shaderProgID, "specularColor"), 1, colorspecular);
+    glUniform3fv(glGetUniformLocation(shaderProgID, "ambientColor"), 1, colorambient);
     glUseProgram(0);
   }
 
@@ -511,13 +523,22 @@ namespace CGL {
     size_retval.x = img_x;
     size_retval.y = img_y;
     size_retval.z = img_n;
+    // TODO TRY 3D coordinates
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
     stbi_image_free(img_data);
+
+//    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+//    glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // repeat texture
+    // visual reference: https://learnopengl.com/Getting-started/Textures
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    // how to scale up or down texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
     return size_retval;
   }
@@ -633,6 +654,9 @@ namespace CGL {
 
     Vector3D centroid;
     meshNode.getCentroid( centroid );
+    ambient = polymesh.material->ambi;
+    specular = polymesh.material->spec;
+    diffuse = polymesh.material->diff;
 
 
 
@@ -1470,20 +1494,7 @@ namespace CGL {
     if(!noDetail) {
       // textures
       glUniform1i(glGetUniformLocation(shaderProgID, "u_texture_1"), 1);
-//      float texCoords[] = {
-//        0.0f, 0.0f,
-//        1.0f, 0.0f
-//      };
-      glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-      glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-//      glTexGenfv(GL_S, GL_OBJECT_PLANE, texCoords);
-//      glTexGenfv(GL_T, GL_OBJECT_PLANE, texCoords);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//      glUniform3fv(glGetUniformLocation(shaderProgID, "in_uv"),
-//                   1, texCoords);
     }
-    
     for( FaceIter f = mesh.facesBegin(); f != mesh.facesEnd(); f++ )
     {
 
@@ -1512,9 +1523,13 @@ namespace CGL {
         if(smoothShading)
           normal = h->vertex()->normal();
         glNormal3dv( &normal.x );
-          float color[] = {1,1,1};
-        glUniform3fv(glGetUniformLocation(shaderProgID, "vertexColor"), 1, color);
+          
+        
 
+        
+        // draw them tex coords
+        Vector2D texcoord = h->vertex()->texcoord;
+        glTexCoord2d(1.0 - texcoord.x, 1.0 - texcoord.y);
         // Draw this vertex.
         Vector3D position = h->vertex()->position;
         glVertex3dv( &position.x );

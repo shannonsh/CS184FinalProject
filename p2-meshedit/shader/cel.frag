@@ -1,5 +1,8 @@
 uniform int outputID;
 uniform vec3 eyePos;
+uniform vec3 diffuseColor;
+uniform vec3 specularColor;
+uniform vec3 ambientColor;
 
 uniform sampler2D u_texture_1;
 //vec2 in_uv;
@@ -18,8 +21,6 @@ vec3 shadePhong(vec3 lightPos);
 
 vec3 shadeEnvmapReflection();
 
-vec3 vertexColor;
-
 void main()
 {
     if(outputID == 0)
@@ -29,7 +30,7 @@ void main()
     }
     if(outputID == 1)
     {
-        gl_FragColor = vec4(shadePhong(vec3(10, 10, 10)), 1.0);
+        gl_FragColor = vec4(shadePhong(vec3(10, -10, 10)), 1.0);
         return;
     }
     if(outputID == 2)
@@ -61,16 +62,11 @@ void main()
     vec3 v_position3 = vertex.xyz;
   
           float intensity;
-          vec3 color = vertexColor;
           vec3 lightDir = vec3(10.0,10.0,10.0) - v_position3;
           intensity = dot(lightDir,normalize(normal));
-          if (intensity > 0.95) color += vec3(1.0,0.5,0.5);
-          else if (intensity > 0.5) color += vec3(0.6,0.3,0.3);
-          else if (intensity > 0.25) color += vec3(0.4,0.2,0.2);
           vec3 view_dir = eyePos - vertex.xyz;
-
-
-        gl_FragColor.xyz = vertexColor;
+        //gl_FragColor.xyz = vec3(1,1,1);
+        gl_FragColor.xyz = diffuseColor;
         gl_FragColor.a = 1.0;
         return;
     }
@@ -100,7 +96,7 @@ vec3 shadePhong(vec3 lightPos)
     float p = 10.0; // Used for specular shading
     // vec3 lightColor = vec3(20.0 / 255.0, 200.0 / 255.0, 250.0 / 255.0);
 //    vec3 lightColor = vec3(175.0 / 251.0, 200.0 / 255.0, 79.0 / 255.0);
-  vec3 lightColor = texture2D(u_texture_1, uv).xyz;
+  vec3 lightColor = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
 
     // Useful vectors for shading, some normalized.
     vec3 lightVec = lightPos - vertex;
@@ -113,7 +109,7 @@ vec3 shadePhong(vec3 lightPos)
     float distFactor = 1.0 / sqrt(dot(lightVec, lightVec));
 
     // Ambient component
-    vec3 ambient = vec3(0.1, 0.1, 0.1);
+    vec3 ambient = ambientColor;
 
     // Diffuse component
 //    float diffuseDot = dot(n, lightDir);
