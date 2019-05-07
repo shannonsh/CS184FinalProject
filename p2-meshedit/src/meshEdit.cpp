@@ -511,7 +511,6 @@ namespace CGL {
     size_retval.x = img_x;
     size_retval.y = img_y;
     size_retval.z = img_n;
-    // TODO TRY 3D coordinates
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
     stbi_image_free(img_data);
 
@@ -1508,7 +1507,13 @@ namespace CGL {
         
         // draw them tex coords
         Vector2D texcoord = h->vertex()->texcoord;
-        glTexCoord2d(1.0 - texcoord.x, 1.0 - texcoord.y);
+        // if no texcoords defined, use vertices
+        if(texcoord.x < 0 || texcoord.y < 0) {
+          glTexCoord3dv(&h->vertex()->position.x);
+        } else { // otherwise use defined texcoords
+          // 1.0 - stuff because Blender and OpenGL use left hand and right hand coordinates respectively
+          glTexCoord2d(texcoord.x, 1.0 - texcoord.y);
+        }
       
         // Draw this vertex.
         Vector3D position = h->vertex()->position;
