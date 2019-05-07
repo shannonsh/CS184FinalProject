@@ -110,9 +110,9 @@ vec3 shadePhong(vec3 lightPos)
 
     // "Constants" to play with for coloring and lighting
     float p = 10.0; // Used for specular shading
-    // vec3 lightColor = vec3(20.0 / 255.0, 200.0 / 255.0, 250.0 / 255.0);
 //    vec3 lightColor = vec3(175.0 / 251.0, 200.0 / 255.0, 79.0 / 255.0);
   vec3 lightColor = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
+//  vec3 lightColor = vec3(gl_TexCoord[0].s, gl_TexCoord[0].t, 0.5);
 
     // Useful vectors for shading, some normalized.
     vec3 lightVec = lightPos - vertex;
@@ -127,7 +127,7 @@ vec3 shadePhong(vec3 lightPos)
     // Ambient component
     vec3 ambient = ambientColor;
 
-    // Diffuse component
+    // Diffuse component (now cel shading)
 //    float diffuseDot = dot(n, lightDir);
 
     // cel shading
@@ -136,12 +136,7 @@ vec3 shadePhong(vec3 lightPos)
     else if (intensity > 0.3) intensity = 0.5;
     else if (intensity > 0.2) intensity = 0.2;
     else intensity = 0.1;
-
-    // add outline around object if camera perp to normal
-    vec3 view_dir = eyePos - vertex.xyz;
-//    if(abs(dot(view_dir, normal)) < 0.4) {
-//      intensity = 0.0;
-//    }
+    intensity = 1.0; // for debugging
     vec3 diffuse = lightColor * clamp(intensity, 0.0, 1.0);
 
     // Specular component

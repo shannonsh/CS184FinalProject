@@ -21,8 +21,8 @@ namespace CGL {
   {
     smoothShading = true;
     shadingMode = true;
-    shaderProgID = loadShaders("../../shader/basic.vert", "../../shader/cel.frag");
-    outlineShader = loadShaders("../../shader/outline.vert", "../../shader/outline.frag");
+    shaderProgID = loadShaders((m_project_root + "shader/basic.vert").c_str(), (m_project_root + "shader/cel.frag").c_str());
+    outlineShader = loadShaders((m_project_root + "shader/outline.vert").c_str(), (m_project_root + "shader/outline.frag").c_str());
     load_textures();
     text_mgr.init(use_hdpi);
     text_color = Color(1.0, 1.0, 1.0);
@@ -215,6 +215,8 @@ namespace CGL {
     glUniform3fv(glGetUniformLocation(shaderProgID, "diffuseColor"), 1, colordiffuse);
     glUniform3fv(glGetUniformLocation(shaderProgID, "specularColor"), 1, colorspecular);
     glUniform3fv(glGetUniformLocation(shaderProgID, "ambientColor"), 1, colorambient);
+    
+    glUniform1i(glGetUniformLocation(shaderProgID, "u_texture_1"), 1);
     glUseProgram(0);
   }
 
@@ -525,7 +527,8 @@ namespace CGL {
     if (strlen(where) == 0) return size_retval;
     
     glActiveTexture(GL_TEXTURE0 + frame_idx);
-    glBindTexture(GL_TEXTURE, handle);
+//    glBindTexture(GL_TEXTURE, handle);
+//    glBindTexture(GL_TEXTURE_2D, handle); // this one displays black, not sure why
     
     
     int img_x, img_y, img_n;
@@ -533,6 +536,8 @@ namespace CGL {
     size_retval.x = img_x;
     size_retval.y = img_y;
     size_retval.z = img_n;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
     stbi_image_free(img_data);
 
@@ -1508,11 +1513,6 @@ namespace CGL {
 
   void MeshEdit::drawFaces( HalfedgeMesh& mesh, bool noDetail )
   {
-    // pass variables into shader
-    if(!noDetail) {
-      // textures
-      glUniform1i(glGetUniformLocation(shaderProgID, "u_texture_1"), 1);
-    }
     for( FaceIter f = mesh.facesBegin(); f != mesh.facesEnd(); f++ )
     {
 
