@@ -61,12 +61,28 @@ void main()
     {
     vec3 v_position3 = vertex.xyz;
   
-          float intensity;
-          vec3 lightDir = vec3(10.0,10.0,10.0) - v_position3;
-          intensity = dot(lightDir,normalize(normal));
-          vec3 view_dir = eyePos - vertex.xyz;
-        //gl_FragColor.xyz = vec3(1,1,1);
+        float intensity;
+        vec3 lightDir = vec3(10.0,10.0,10.0) - v_position3;
+        intensity = dot(normalize(lightDir),normalize(normal));
         gl_FragColor.xyz = diffuseColor;
+
+        float maxval = max(gl_FragColor.x, gl_FragColor.y);
+        maxval = max(maxval, gl_FragColor.z); 
+
+
+        float n = 100.0; //LEVEL OF SHADING
+        vec3 shadecolor = vec3(1,1,0); //COLOR OF THE SHADOW
+
+
+
+
+        for (float i = 1.0/n; i < 1.0; i += 1.0/n) {
+            if (intensity < i) gl_FragColor.xyz -= vec3(maxval/n,maxval/n,maxval/n) * shadecolor;
+        }
+
+        
+        vec3 view_dir = eyePos - vertex.xyz;
+        //gl_FragColor.xyz = diffuseColor + addon;
         gl_FragColor.a = 1.0;
         return;
     }
