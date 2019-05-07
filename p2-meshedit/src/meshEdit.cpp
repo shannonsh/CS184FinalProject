@@ -245,6 +245,16 @@ namespace CGL {
         1.0*screen_w/screen_h, // Aspect Ratio.
         nearClip,              // distance near side of the view frustrum.
         farClip);              // far side of the view frustrum.
+
+    glUseProgram(outlineShader);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluPerspective( vfov,                  // Field of view in DEGREES.
+                   1.0*screen_w/screen_h, // Aspect Ratio.
+                   nearClip,              // distance near side of the view frustrum.
+                   farClip);              // far side of the view frustrum.
+    glUseProgram(shaderProgID);
   }
 
   string MeshEdit::name() {
@@ -656,6 +666,8 @@ namespace CGL {
     ambient = polymesh.material->ambi;
     specular = polymesh.material->spec;
     diffuse = polymesh.material->diff;
+    
+    meshNode.mesh.modelView = Matrix4x4(polymesh.modelView);
 
 
 
@@ -1435,10 +1447,16 @@ namespace CGL {
 
   void MeshEdit::renderMesh( HalfedgeMesh& mesh )
   {
+    Matrix4x4 mat = mesh.modelView;
     // draw them outlines
     glUseProgram(outlineShader);
     outlineGLSettings();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+//    glLoadIdentity();
+    glTranslated( mat(0,3), mat(1,3), 0.f );
     drawFaces(mesh, true);
+    glPopMatrix();
     glEnable(GL_LIGHTING);
     mainGLSettings();
     
@@ -1446,6 +1464,7 @@ namespace CGL {
       glUseProgram(shaderProgID);
     else
       glUseProgram(0);
+    glTranslated( mat(0,3), mat(1,3), mat(2,3) );
     glEnable(GL_LIGHTING);
     drawFaces( mesh, false );
     glDisable(GL_LIGHTING);
