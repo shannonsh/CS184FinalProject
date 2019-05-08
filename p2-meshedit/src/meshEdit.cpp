@@ -10,10 +10,6 @@
 
 #include <cmath>
 
-Color ambient;
-Color specular;
-Color diffuse;
-
 namespace CGL {
 
 
@@ -206,15 +202,6 @@ namespace CGL {
     glUniform3fv(glGetUniformLocation(shaderProgID, "eyePos"),
         1, eyePos);
     glUniform1i(glGetUniformLocation(shaderProgID, "envmap"), 1);
-      
-    //sets ambient, specular, diffuse colors from model
-    float colordiffuse[] = {diffuse.r,diffuse.g,diffuse.b};
-    float colorspecular[] = {specular.r, specular.g, specular.b};
-    float colorambient[] = {ambient.r, ambient.g, ambient.b};
-
-    glUniform3fv(glGetUniformLocation(shaderProgID, "diffuseColor"), 1, colordiffuse);
-    glUniform3fv(glGetUniformLocation(shaderProgID, "specularColor"), 1, colorspecular);
-    glUniform3fv(glGetUniformLocation(shaderProgID, "ambientColor"), 1, colorambient);
     
     glUniform1i(glGetUniformLocation(shaderProgID, "u_texture_1"), 1);
     glUseProgram(0);
@@ -668,11 +655,10 @@ namespace CGL {
 
     Vector3D centroid;
     meshNode.getCentroid( centroid );
-    ambient = polymesh.material->ambi;
-    specular = polymesh.material->spec;
-    diffuse = polymesh.material->diff;
     
     meshNode.mesh.modelView = Matrix4x4(polymesh.modelView);
+    meshNode.mesh.material = new Material();
+    meshNode.mesh.material->copy(polymesh.material);
 
 
 
@@ -1469,7 +1455,23 @@ namespace CGL {
       glUseProgram(shaderProgID);
     else
       glUseProgram(0);
+    
+    // translate object to its proper position
     glTranslated( mat(0,3), mat(1,3), mat(2,3) );
+    
+    if(mesh.material) {
+      Color diffuse = mesh.material->diff;
+      Color specular = mesh.material->spec;
+      Color ambient = mesh.material->ambi;
+      //sets ambient, specular, diffuse colors from model
+      float colordiffuse[] = {diffuse.r,diffuse.g,diffuse.b};
+      float colorspecular[] = {specular.r, specular.g, specular.b};
+      float colorambient[] = {ambient.r, ambient.g, ambient.b};
+      
+      glUniform3fv(glGetUniformLocation(shaderProgID, "diffuseColor"), 1, colordiffuse);
+      glUniform3fv(glGetUniformLocation(shaderProgID, "specularColor"), 1, colorspecular);
+      glUniform3fv(glGetUniformLocation(shaderProgID, "ambientColor"), 1, colorambient);
+    }
     glEnable(GL_LIGHTING);
     drawFaces( mesh, false );
     glDisable(GL_LIGHTING);

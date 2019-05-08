@@ -446,6 +446,8 @@ namespace CGL {
       for(   FaceIter b = boundariesBegin(); b != boundariesEnd(); b++ ) b->halfedge() = halfedgeOldToNew[ b->halfedge() ];
       
       this->modelView = Matrix4x4(mesh.modelView);
+      this->material = new Material();
+      this->material->copy(mesh.material);
       // Return a reference to the new mesh.
       return *this;
     }

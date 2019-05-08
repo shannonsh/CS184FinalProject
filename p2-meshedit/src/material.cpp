@@ -4,6 +4,18 @@ using namespace std;
 
 namespace CGL {
 
+  void Material::copy(Material* source) {
+    this->id =   source->id;
+    this->name = source->name;
+    this->type = source->type;
+    this->emit = source->emit;
+    this->ambi = source->ambi;
+    this->diff = source->diff;
+    this->spec = source->spec;
+    this->shininess = source->shininess;
+    this->refractive_index = source->refractive_index;
+  }
+  
   std::ostream& operator<<( std::ostream& os, const Material& material ) {
 
     os << "Material: " << material.name << " (id:" << material.id << ")";
