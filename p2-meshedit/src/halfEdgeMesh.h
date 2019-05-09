@@ -534,6 +534,7 @@ namespace CGL
    {
       public:
          Matrix4x4 modelView;
+         Material* material;
      
          /**
           * Constructor.

@@ -15,6 +15,7 @@ Color specular;
 Color diffuse;
 float nvalue = 2.0;
 
+
 namespace CGL {
 
 
@@ -22,8 +23,8 @@ namespace CGL {
   {
     smoothShading = true;
     shadingMode = true;
-    shaderProgID = loadShaders("../../shader/basic.vert", "../../shader/cel.frag");
-    outlineShader = loadShaders("../../shader/outline.vert", "../../shader/outline.frag");
+    shaderProgID = loadShaders((m_project_root + "shader/basic.vert").c_str(), (m_project_root + "shader/cel.frag").c_str());
+    outlineShader = loadShaders((m_project_root + "shader/outline.vert").c_str(), (m_project_root + "shader/outline.frag").c_str());
     load_textures();
     text_mgr.init(use_hdpi);
     text_color = Color(1.0, 1.0, 1.0);
@@ -207,15 +208,8 @@ namespace CGL {
     glUniform3fv(glGetUniformLocation(shaderProgID, "eyePos"),
         1, eyePos);
     glUniform1i(glGetUniformLocation(shaderProgID, "envmap"), 1);
-      
-    //sets ambient, specular, diffuse colors from model
-    float colordiffuse[] = {diffuse.r,diffuse.g,diffuse.b};
-    float colorspecular[] = {specular.r, specular.g, specular.b};
-    float colorambient[] = {ambient.r, ambient.g, ambient.b};
-
-    glUniform3fv(glGetUniformLocation(shaderProgID, "diffuseColor"), 1, colordiffuse);
-    glUniform3fv(glGetUniformLocation(shaderProgID, "specularColor"), 1, colorspecular);
-    glUniform3fv(glGetUniformLocation(shaderProgID, "ambientColor"), 1, colorambient);
+    
+    glUniform1i(glGetUniformLocation(shaderProgID, "u_texture_1"), 1);
     glUseProgram(0);
   }
 
@@ -535,7 +529,8 @@ namespace CGL {
     if (strlen(where) == 0) return size_retval;
     
     glActiveTexture(GL_TEXTURE0 + frame_idx);
-    glBindTexture(GL_TEXTURE, handle);
+//    glBindTexture(GL_TEXTURE, handle);
+//    glBindTexture(GL_TEXTURE_2D, handle); // this one displays black, not sure why
     
     
     int img_x, img_y, img_n;
@@ -543,6 +538,8 @@ namespace CGL {
     size_retval.x = img_x;
     size_retval.y = img_y;
     size_retval.z = img_n;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
     stbi_image_free(img_data);
 
@@ -673,11 +670,10 @@ namespace CGL {
 
     Vector3D centroid;
     meshNode.getCentroid( centroid );
-    ambient = polymesh.material->ambi;
-    specular = polymesh.material->spec;
-    diffuse = polymesh.material->diff;
     
     meshNode.mesh.modelView = Matrix4x4(polymesh.modelView);
+    meshNode.mesh.material = new Material();
+    meshNode.mesh.material->copy(polymesh.material);
 
 
 
@@ -1442,7 +1438,7 @@ namespace CGL {
 
   }
 
-  //===================== End of MeshEdit class.
+  //------------ End of MeshEdit class.
 
 
   //************************************************************************/
@@ -1474,7 +1470,23 @@ namespace CGL {
       glUseProgram(shaderProgID);
     else
       glUseProgram(0);
+    
+    // translate object to its proper position
     glTranslated( mat(0,3), mat(1,3), mat(2,3) );
+    
+    if(mesh.material) {
+      Color diffuse = mesh.material->diff;
+      Color specular = mesh.material->spec;
+      Color ambient = mesh.material->ambi;
+      //sets ambient, specular, diffuse colors from model
+      float colordiffuse[] = {diffuse.r,diffuse.g,diffuse.b};
+      float colorspecular[] = {specular.r, specular.g, specular.b};
+      float colorambient[] = {ambient.r, ambient.g, ambient.b};
+      
+      glUniform3fv(glGetUniformLocation(shaderProgID, "diffuseColor"), 1, colordiffuse);
+      glUniform3fv(glGetUniformLocation(shaderProgID, "specularColor"), 1, colorspecular);
+      glUniform3fv(glGetUniformLocation(shaderProgID, "ambientColor"), 1, colorambient);
+    }
     glEnable(GL_LIGHTING);
     drawFaces( mesh, false );
     glDisable(GL_LIGHTING);
@@ -1518,11 +1530,6 @@ namespace CGL {
 
   void MeshEdit::drawFaces( HalfedgeMesh& mesh, bool noDetail )
   {
-    // pass variables into shader
-    if(!noDetail) {
-      // textures
-      glUniform1i(glGetUniformLocation(shaderProgID, "u_texture_1"), 1);
-    }
     for( FaceIter f = mesh.facesBegin(); f != mesh.facesEnd(); f++ )
     {
 

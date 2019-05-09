@@ -140,6 +140,8 @@ namespace CGL {
             }
            
             mesh.build( polygons, polyMesh.vertices, polyMesh.texcoords, polyMesh.modelView  );
+           mesh.material = new Material();
+           mesh.material->copy(polyMesh.material);
          }
 
          // Destructor --- this destructor shouldn't be needed according to the
