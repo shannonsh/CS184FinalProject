@@ -13,6 +13,7 @@
 Color ambient;
 Color specular;
 Color diffuse;
+float nvalue = 2.0;
 
 namespace CGL {
 
@@ -220,6 +221,9 @@ namespace CGL {
 
   void MeshEdit::draw_meshes()
   {
+    glUseProgram(shaderProgID);
+    glUniform1f(glGetUniformLocation(shaderProgID, "n"), nvalue);
+    glUseProgram(0);
     for( vector<MeshNode>::iterator n = meshNodes.begin(); n != meshNodes.end(); n++ )
     {
       renderMesh( n->mesh );
@@ -342,14 +346,20 @@ namespace CGL {
       case '=':
         //printf("%s\n", "move z+");
        //view_focus += Vector3D(0, -1, 0);
-        scroll_event( 0, 0.5);
-        update_camera();
+        //scroll_event( 0, 0.5);
+        //update_camera();
+        nvalue += 1;
+        draw_meshes();
         break;
       case '-':
         //printf("%s\n", "move z-");
         //view_focus += Vector3D(0, 1, 0);
-        scroll_event( 0, -0.5);
-        update_camera();
+        //scroll_event( 0, -0.5);
+        nvalue -= 1;
+        if (nvalue < 1) {
+          nvalue = 1;
+        }
+        draw_meshes();
 
         
       default:

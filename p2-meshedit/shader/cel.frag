@@ -3,6 +3,7 @@ uniform vec3 eyePos;
 uniform vec3 diffuseColor;
 uniform vec3 specularColor;
 uniform vec3 ambientColor;
+uniform float n;
 
 uniform sampler2D u_texture_1;
 //vec2 in_uv;
@@ -20,6 +21,7 @@ vec3 shadeDiffuseFromEye();
 vec3 shadePhong(vec3 lightPos);
 
 vec3 shadeEnvmapReflection();
+
 
 void main()
 {
@@ -57,7 +59,6 @@ void main()
 	    return;
     }
     if(outputID == 3)
-    //DAE color here
     {
     vec3 v_position3 = vertex.xyz;
   
@@ -67,10 +68,8 @@ void main()
         gl_FragColor.xyz = diffuseColor;
 
         float maxval = max(gl_FragColor.x, gl_FragColor.y);
-        maxval = max(maxval, gl_FragColor.z); 
-
-
-        float n = 100.0; //LEVEL OF SHADING
+        maxval = max(maxval, gl_FragColor.z);
+        if (maxval == 0.0) maxval = -1.0; 
         vec3 shadecolor = vec3(1,1,0); //COLOR OF THE SHADOW
 
 
