@@ -73,6 +73,11 @@ namespace CGL {
     // Note: Viewer is in the positive z direction,
     // so we make that component significant.
     GLfloat light_position[] = {.2, 0.5, 1.0, 0.0};
+
+    //
+    glUseProgram(shaderProgID);
+    glUniform3fv(glGetUniformLocation(shaderProgID, "light_position"), 1, light_position);
+    glUseProgram(0);
     /* Enable a single OpenGL light. */
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);

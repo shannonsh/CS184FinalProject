@@ -5,6 +5,7 @@ uniform vec3 specularColor;
 uniform vec3 ambientColor;
 uniform float n;
 uniform bool tex_bool;
+uniform vec3 light_position;
 
 uniform sampler2D u_texture_1;
 //vec2 in_uv;
@@ -33,7 +34,7 @@ void main()
     }
     if(outputID == 1)
     {
-        gl_FragColor = vec4(shadePhong(vec3(10, -10, 10)), 1.0);
+        gl_FragColor = vec4(shadePhong(light_position), 1.0);
         return;
     }
     if(outputID == 2)
@@ -41,7 +42,7 @@ void main()
     vec3 v_position3 = vertex.xyz;
   
         float intensity;
-        vec3 lightDir = vec3(10.0,10.0,10.0) - v_position3;
+        vec3 lightDir = light_position - v_position3;
         intensity = dot(normalize(lightDir),normalize(normal));
         if (tex_bool) {
             gl_FragColor.xyz = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
@@ -123,7 +124,7 @@ vec3 shadePhong(vec3 lightPos)
     else if (intensity > 0.3) intensity = 0.5;
     else if (intensity > 0.2) intensity = 0.2;
     else intensity = 0.1;
-    intensity = 1.0; // for debugging
+    //intensity = 1.0; // for debugging
     vec3 diffuse = lightColor * clamp(intensity, 0.0, 1.0);
 
     // Specular component
