@@ -14,6 +14,7 @@ Color ambient;
 Color specular;
 Color diffuse;
 float nvalue = 2.0;
+bool toggletex = false;
 
 
 namespace CGL {
@@ -217,6 +218,7 @@ namespace CGL {
   {
     glUseProgram(shaderProgID);
     glUniform1f(glGetUniformLocation(shaderProgID, "n"), nvalue);
+    glUniform1i(glGetUniformLocation(shaderProgID, "tex_bool"), toggletex);
     glUseProgram(0);
     for( vector<MeshNode>::iterator n = meshNodes.begin(); n != meshNodes.end(); n++ )
     {
@@ -301,7 +303,8 @@ namespace CGL {
         break;
       case 't':
       case 'T':
-        selectTwinHalfedge();
+            toggletex = !toggletex;
+            draw_meshes();
         break;
       case 'r':
       case 'R':
