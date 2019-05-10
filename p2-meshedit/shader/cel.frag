@@ -123,12 +123,13 @@ vec3 shadePhong(vec3 lightPos)
     ////////////////////////////////////////
     // TODO: REMOVE BEFORE RELEASING.
     ////////////////////////////////////////
-
+//  lightPos.z += 10.0;
     // "Constants" to play with for coloring and lighting
     float p = 10.0; // Used for specular shading
 //    vec3 lightColor = vec3(175.0 / 251.0, 200.0 / 255.0, 79.0 / 255.0);
   vec3 lightColor = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
-//  vec3 lightColor = vec3(gl_TexCoord[0].s, gl_TexCoord[0].t, 0.5);
+//  vec3 lightColor = vec3(gl_TexCoord[0].s, gl_TexCoord[0].t, 0.0);
+//  vec3 lightColor = diffuseColor;
 
     if (tex_bool) {
             lightColor = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
@@ -158,7 +159,7 @@ vec3 shadePhong(vec3 lightPos)
     else if (intensity > 0.3) intensity = 0.5;
     else if (intensity > 0.2) intensity = 0.2;
     else intensity = 0.1;
-    //intensity = 1.0; // for debugging
+//    intensity = 1.0; // for debugging
     vec3 diffuse = lightColor * clamp(intensity, 0.0, 1.0);
 
     // Specular component
@@ -172,6 +173,7 @@ vec3 shadePhong(vec3 lightPos)
     else specularDot = 0.01;
     vec3 specular = specularColor * pow(clamp(specularDot, 0.0, 1.0), p);
     // specularColor is "k_s"
+  // TODO: decide whether to prioritize textures > color or specify manually to use texture or color
 
     // Phong shading is the summation of diffuse, ambient, and specular shading components.
     return diffuse + ambient + specular;

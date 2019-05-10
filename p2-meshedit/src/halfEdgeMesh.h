@@ -300,7 +300,9 @@ namespace CGL
    class Halfedge : public HalfedgeElement
    {
       public:
-
+     
+         Vector2D texcoord;
+     
          HalfedgeIter&   twin( void ) { return _twin;   } ///< access the twin half edge
          HalfedgeIter&   next( void ) { return _next;   } ///< access the next half edge
          VertexIter&   vertex( void ) { return _vertex; } ///< access the vertex in the half edge
@@ -430,7 +432,6 @@ namespace CGL
 
          Vector3D newPosition; ///< For Loop subdivision, this will be the updated position of the vertex
          bool isNew; ///< For Loop subdivision, this flag should be true if and only if this vertex is a new vertex created by subdivision (i.e., if it corresponds to a vertex of the original mesh)
-         Vector2D texcoord;
      
          /**
           * computes the average of the neighboring vertex positions and stores it in Vertex::centroid
@@ -562,10 +563,10 @@ namespace CGL
           * The input must describe a manifold, oriented surface, where the orientation of
           * a polygon is determined by the order of vertices in the list.
           */
-         void build( const vector< vector<Index> >& polygons, const vector<Vector3D>& vertexPositions, const vector<Vector2D>& texcoords, Matrix4x4 modelViewMat );
+         void build( PolyList polygons, const vector<Vector3D>& vertexPositions, const vector<Vector2D>& texcoords, Matrix4x4 modelViewMat );
 
          // These methods return the total number of elements of each type.
-         Size nHalfedges  ( void ) const { return  halfedges.size(); } ///< get the number of halfedges
+//         Size nHalfedges  ( void ) const { return  halfedges.size(); } ///< get the number of halfedges
          Size nVertices   ( void ) const { return   vertices.size(); } ///< get the number of vertices
          Size nEdges      ( void ) const { return      edges.size(); } ///< get the number of edges
          Size nFaces      ( void ) const { return      faces.size(); } ///< get the number of faces

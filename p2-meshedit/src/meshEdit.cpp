@@ -1571,7 +1571,7 @@ namespace CGL {
 
         
         // draw them tex coords
-        Vector2D texcoord = h->vertex()->texcoord;
+        Vector2D texcoord = h->texcoord;
 
         // if no texcoords defined, use vertices
         if(texcoord.x < 0 || texcoord.y < 0) {

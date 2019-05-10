@@ -125,21 +125,8 @@ namespace CGL {
          // Constructor.
          MeshNode( Polymesh& polyMesh )
          {
-
-            // Construct a new array of index lists for the halfedgemesh structure.
-            vector< vector<size_t> > polygons;
-
-            // Currently, the halfedge data structure only stores the connectivity of
-            // the mesh and the vertex positions; here we just want to copy the
-            // connectivity into our local array ("polygons").
-            for( PolyListIter p  = polyMesh.polygons.begin();
-                              p != polyMesh.polygons.end();
-                              p ++ )
-            {
-               polygons.push_back( p->vertex_indices );
-            }
            
-            mesh.build( polygons, polyMesh.vertices, polyMesh.texcoords, polyMesh.modelView  );
+            mesh.build( polyMesh.polygons, polyMesh.vertices, polyMesh.texcoords, polyMesh.modelView  );
            mesh.material = new Material();
            mesh.material->copy(polyMesh.material);
          }
