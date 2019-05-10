@@ -19,6 +19,7 @@ namespace CGL {
 
     Texture* tex; ///< texture
 
+    void copy(Material* dest);
   }; // struct Material
 
   std::ostream& operator<<( std::ostream& os, const Material& material );

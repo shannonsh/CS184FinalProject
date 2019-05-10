@@ -32,8 +32,8 @@ namespace CGL {
     return N.unit();
   }
 
-  void HalfedgeMesh :: build( const vector< vector<Index> >& polygons,
-    const vector<Vector3D>& vertexPositions )
+  void HalfedgeMesh :: build( PolyList polygons,
+    const vector<Vector3D>& vertexPositions, const vector<Vector2D>& texcoords, Matrix4x4 modelViewMat )
     // This method initializes the halfedge data structure from a raw list of polygons,
     // where each input polygon is specified as a list of vertex indices.  The input
     // must describe a manifold, oriented surface, where the orientation of a polygon
@@ -51,6 +51,20 @@ namespace CGL {
     // lowest index appearing in any polygon corresponds to the first entry of the list
     // of positions and so on).
     {
+      
+      // Construct a new array of index lists for the halfedgemesh structure.
+      vector< vector<Index> > vertexList;
+
+      // Currently, the halfedge data structure only stores the connectivity of
+      // the mesh and the vertex positions; here we just want to copy the
+      // connectivity into our local array ("polygons").
+      for( PolyListIter p  = polygons.begin();
+          p != polygons.end();
+          p ++ )
+      {
+        vertexList.push_back( p->vertex_indices );
+      }
+      
       // define some types, to improve readability
       typedef vector<Index> IndexList;
       typedef IndexList::const_iterator IndexListCIter;
@@ -82,7 +96,7 @@ namespace CGL {
       map<VertexIter,Size> vertexDegree;
 
       // First, we do some basic sanity checks on the input.
-      for( PolygonListCIter p = polygons.begin(); p != polygons.end(); p++ )
+      for( PolygonListCIter p = vertexList.begin(); p != vertexList.end(); p++ )
       {
         if( p->size() < 3 )
         {
@@ -143,7 +157,7 @@ namespace CGL {
       Size nVertices = indexToVertex.size();
 
       // The number of faces is just the number of polygons in the input.
-      Size nFaces = polygons.size();
+      Size nFaces = vertexList.size();
       faces.resize( nFaces ); // allocate storage for faces in our new mesh
 
       // We will store a map from ordered pairs of vertex indices to
@@ -154,8 +168,9 @@ namespace CGL {
       // Next, we actually build the halfedge connectivity by again looping over polygons
       PolygonListCIter p;
       FaceIter f;
-      for( p = polygons.begin(), f = faces.begin();
-      p != polygons.end();
+      int faceNum = 0;
+      for( p = vertexList.begin(), f = faces.begin();
+      p != vertexList.end();
       p++, f++ )
       {
         vector<HalfedgeIter> faceHalfedges; // cyclically ordered list of the half edges of this face
@@ -191,6 +206,10 @@ namespace CGL {
             // also link it to its starting vertex
             hab->vertex() = indexToVertex[a];
             hab->vertex()->halfedge() = hab;
+            
+            int texcoord_idx = polygons[faceNum].texcoord_indices[i];
+            if(texcoord_idx < texcoords.size())
+              hab->texcoord = texcoords[texcoord_idx];
 
             // keep a list of halfedges in this face, so that we can later
             // link them together in a loop (via their "next" pointers)
@@ -235,6 +254,8 @@ namespace CGL {
           Index j = (i+1) % degree; // index of the next halfedge, in cyclic order
           faceHalfedges[i]->next() = faceHalfedges[j];
         }
+        
+        faceNum++;
 
       } // done building basic halfedge connectivity
 
@@ -390,6 +411,7 @@ namespace CGL {
         v->position = vertexPositions[ i ];
         i++;
       }
+      modelView = modelViewMat;
 
     } // end HalfedgeMesh::build()
 
@@ -438,7 +460,10 @@ namespace CGL {
       for(   EdgeIter e =      edgesBegin(); e !=      edgesEnd(); e++ ) e->halfedge() = halfedgeOldToNew[ e->halfedge() ];
       for(   FaceIter f =      facesBegin(); f !=      facesEnd(); f++ ) f->halfedge() = halfedgeOldToNew[ f->halfedge() ];
       for(   FaceIter b = boundariesBegin(); b != boundariesEnd(); b++ ) b->halfedge() = halfedgeOldToNew[ b->halfedge() ];
-
+      
+      this->modelView = Matrix4x4(mesh.modelView);
+      this->material = new Material();
+      this->material->copy(mesh.material);
       // Return a reference to the new mesh.
       return *this;
     }

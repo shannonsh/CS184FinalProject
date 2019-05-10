@@ -10,6 +10,13 @@
 
 #include <cmath>
 
+Color ambient;
+Color specular;
+Color diffuse;
+float nvalue = 2.0;
+bool toggletex = false;
+
+
 namespace CGL {
 
 
@@ -17,8 +24,8 @@ namespace CGL {
   {
     smoothShading = true;
     shadingMode = true;
-    shaderProgID = loadShaders("../../shader/basic.vert", "../../shader/cel.frag");
-    outlineShader = loadShaders("../../shader/outline.vert", "../../shader/outline.frag");
+    shaderProgID = loadShaders((m_project_root + "shader/basic.vert").c_str(), (m_project_root + "shader/cel.frag").c_str());
+    outlineShader = loadShaders((m_project_root + "shader/outline.vert").c_str(), (m_project_root + "shader/outline.frag").c_str());
     load_textures();
     text_mgr.init(use_hdpi);
     text_color = Color(1.0, 1.0, 1.0);
@@ -65,7 +72,12 @@ namespace CGL {
     // Infinite light location.
     // Note: Viewer is in the positive z direction,
     // so we make that component significant.
-    GLfloat light_position[] = {.2, 0.5, 1.0, 0.0};
+    GLfloat light_position[] = {10,10,10,  0.0};
+
+    //
+    glUseProgram(shaderProgID);
+    glUniform3fv(glGetUniformLocation(shaderProgID, "light_position"), 1, light_position);
+    glUseProgram(0);
     /* Enable a single OpenGL light. */
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
@@ -198,16 +210,21 @@ namespace CGL {
         up_x, up_y, up_z);// up direction.
 
     float eyePos[] = {cx, cy, cz};
-
     glUseProgram(shaderProgID);
     glUniform3fv(glGetUniformLocation(shaderProgID, "eyePos"),
         1, eyePos);
     glUniform1i(glGetUniformLocation(shaderProgID, "envmap"), 1);
+    
+    glUniform1i(glGetUniformLocation(shaderProgID, "u_texture_1"), 1);
     glUseProgram(0);
   }
 
   void MeshEdit::draw_meshes()
   {
+    glUseProgram(shaderProgID);
+    glUniform1f(glGetUniformLocation(shaderProgID, "n"), nvalue);
+    glUniform1i(glGetUniformLocation(shaderProgID, "tex_bool"), toggletex);
+    glUseProgram(0);
     for( vector<MeshNode>::iterator n = meshNodes.begin(); n != meshNodes.end(); n++ )
     {
       renderMesh( n->mesh );
@@ -233,6 +250,16 @@ namespace CGL {
         1.0*screen_w/screen_h, // Aspect Ratio.
         nearClip,              // distance near side of the view frustrum.
         farClip);              // far side of the view frustrum.
+
+    glUseProgram(outlineShader);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluPerspective( vfov,                  // Field of view in DEGREES.
+                   1.0*screen_w/screen_h, // Aspect Ratio.
+                   nearClip,              // distance near side of the view frustrum.
+                   farClip);              // far side of the view frustrum.
+    glUseProgram(shaderProgID);
   }
 
   string MeshEdit::name() {
@@ -281,7 +308,8 @@ namespace CGL {
         break;
       case 't':
       case 'T':
-        selectTwinHalfedge();
+            toggletex = !toggletex;
+            draw_meshes();
         break;
       case 'r':
       case 'R':
@@ -294,40 +322,46 @@ namespace CGL {
       case 'w':
       case 'W':
         //printf("%s\n", "move up");
-        view_focus += Vector3D(0, 0, -1);
+        view_focus += Vector3D(0, 0, -0.5);
         update_camera();
         break;
       case 'a':
       case 'A':
         //printf("%s\n", "move left");
 
-        view_focus += Vector3D(-1, 0, 0);
+        view_focus += Vector3D(-0.5, 0, 0);
         update_camera();
         break;
       case 's':
       case 'S':
         //printf("%s\n", "move down");
-        view_focus += Vector3D(0, 0, 1);
+        view_focus += Vector3D(0, 0, 0.5);
         
         update_camera();
         break;
       case 'd':
       case 'D':
         //printf("%s\n", "move right");
-        view_focus += Vector3D(1, 0, 0);
+        view_focus += Vector3D(0.5, 0, 0);
         update_camera();
         break;
       case '=':
         //printf("%s\n", "move z+");
        //view_focus += Vector3D(0, -1, 0);
-        scroll_event( 0, 1);
-        update_camera();
+        //scroll_event( 0, 0.5);
+        //update_camera();
+        nvalue += 1;
+        draw_meshes();
         break;
       case '-':
         //printf("%s\n", "move z-");
         //view_focus += Vector3D(0, 1, 0);
-        scroll_event( 0, -1);
-        update_camera();
+        //scroll_event( 0, -0.5);
+        nvalue -= 1;
+        if (nvalue < 1) {
+          nvalue = 1;
+        }
+        draw_meshes();
 
         
       default:
@@ -503,7 +537,8 @@ namespace CGL {
     if (strlen(where) == 0) return size_retval;
     
     glActiveTexture(GL_TEXTURE0 + frame_idx);
-    glBindTexture(GL_TEXTURE_2D, handle);
+//    glBindTexture(GL_TEXTURE, handle);
+//    glBindTexture(GL_TEXTURE_2D, handle); // this one displays black, not sure why
     
     
     int img_x, img_y, img_n;
@@ -511,33 +546,44 @@ namespace CGL {
     size_retval.x = img_x;
     size_retval.y = img_y;
     size_retval.z = img_n;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img_x, img_y, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
     stbi_image_free(img_data);
+
+//    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+//    glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // repeat texture
+    // visual reference: https://learnopengl.com/Getting-started/Textures
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    // how to scale up or down texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     
     return size_retval;
   }
   
   void MeshEdit::load_textures( void ) {
     glGenTextures(1, &m_gl_texture_1);
-    glGenTextures(1, &m_gl_texture_2);
-    glGenTextures(1, &m_gl_texture_3);
-    glGenTextures(1, &m_gl_texture_4);
-    glGenTextures(1, &m_gl_cubemap_tex);
+//    glGenTextures(1, &m_gl_texture_2);
+//    glGenTextures(1, &m_gl_texture_3);
+//    glGenTextures(1, &m_gl_texture_4);
+//    glGenTextures(1, &m_gl_cubemap_tex);
     
     m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/texture_1.png").c_str());
-    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
-    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
-    m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
+//    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
+//    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
+//    m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
+
     
     std::cout << "Texture 1 loaded with size: " << m_gl_texture_1_size << std::endl;
-    std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
-    std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
-    std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
+//    std::cout << "Texture 2 loaded with size: " << m_gl_texture_2_size << std::endl;
+//    std::cout << "Texture 3 loaded with size: " << m_gl_texture_3_size << std::endl;
+//    std::cout << "Texture 4 loaded with size: " << m_gl_texture_4_size << std::endl;
     
 //    std::vector<std::string> cubemap_fnames = {
 //      m_project_root + "/textures/cube/posx.jpg",
@@ -632,6 +678,10 @@ namespace CGL {
 
     Vector3D centroid;
     meshNode.getCentroid( centroid );
+    
+    meshNode.mesh.modelView = Matrix4x4(polymesh.modelView);
+    meshNode.mesh.material = new Material();
+    meshNode.mesh.material->copy(polymesh.material);
 
 
 
@@ -704,6 +754,8 @@ namespace CGL {
     Vertex* v = NULL;
     if (selectedFeature.isValid()) {
       v = selectedFeature.element->getVertex();
+      cout << v;
+
     }
 
     if(!mouse_rotate && v != NULL)
@@ -716,7 +768,7 @@ namespace CGL {
     if(mouse_rotate)
     {
       
-      double & cx = camera_angles.x;
+      /*double & cx = camera_angles.x;
       double & cy = camera_angles.y;
 
       double alpha_x = dx * 2 * PI / screen_w;
@@ -775,6 +827,20 @@ namespace CGL {
         cx += 2 * PI;
       }
       // cx = cx >= 0 ? min(cx, cx - 2*PI) : (cx + 2*PI);
+
+      // Bound the vertical view angle.
+      camera_angles.y = bound(camera_angles.y, -PI/2, PI/2);*/
+
+      double & cx = camera_angles.x;
+
+      double & cy = camera_angles.y;
+
+      cx += dx*2*PI/screen_w;
+      cy += dy*  PI/screen_h;
+
+      // Users can freely rotate the model's as much as they
+      // want in the horizontal direction.
+      cx = cx >= 0 ? min(cx, cx - 2*PI) : (cx + 2*PI);
 
       // Bound the vertical view angle.
       camera_angles.y = bound(camera_angles.y, -PI/2, PI/2);
@@ -1380,7 +1446,7 @@ namespace CGL {
 
   }
 
-  //===================== End of MeshEdit class.
+  //------------ End of MeshEdit class.
 
 
   //************************************************************************/
@@ -1395,10 +1461,16 @@ namespace CGL {
 
   void MeshEdit::renderMesh( HalfedgeMesh& mesh )
   {
+    Matrix4x4 mat = mesh.modelView;
     // draw them outlines
     glUseProgram(outlineShader);
     outlineGLSettings();
-    drawFaces(mesh);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+//    glLoadIdentity();
+    glTranslated( mat(0,3), mat(1,3), 0.f );
+    drawFaces(mesh, true);
+    glPopMatrix();
     glEnable(GL_LIGHTING);
     mainGLSettings();
     
@@ -1406,8 +1478,25 @@ namespace CGL {
       glUseProgram(shaderProgID);
     else
       glUseProgram(0);
+    
+    // translate object to its proper position
+    glTranslated( mat(0,3), mat(1,3), mat(2,3) );
+    
+    if(mesh.material) {
+      Color diffuse = mesh.material->diff;
+      Color specular = mesh.material->spec;
+      Color ambient = mesh.material->ambi;
+      //sets ambient, specular, diffuse colors from model
+      float colordiffuse[] = {diffuse.r,diffuse.g,diffuse.b};
+      float colorspecular[] = {specular.r, specular.g, specular.b};
+      float colorambient[] = {ambient.r, ambient.g, ambient.b};
+      
+      glUniform3fv(glGetUniformLocation(shaderProgID, "diffuseColor"), 1, colordiffuse);
+      glUniform3fv(glGetUniformLocation(shaderProgID, "specularColor"), 1, colorspecular);
+      glUniform3fv(glGetUniformLocation(shaderProgID, "ambientColor"), 1, colorambient);
+    }
     glEnable(GL_LIGHTING);
-    drawFaces( mesh );
+    drawFaces( mesh, false );
     glDisable(GL_LIGHTING);
 
     glUseProgram(0);
@@ -1447,9 +1536,8 @@ namespace CGL {
     cerr << "Warning: draw style not defined for current mesh element!" << endl;
   }
 
-  void MeshEdit::drawFaces( HalfedgeMesh& mesh )
+  void MeshEdit::drawFaces( HalfedgeMesh& mesh, bool noDetail )
   {
-
     for( FaceIter f = mesh.facesBegin(); f != mesh.facesEnd(); f++ )
     {
 
@@ -1478,6 +1566,21 @@ namespace CGL {
         if(smoothShading)
           normal = h->vertex()->normal();
         glNormal3dv( &normal.x );
+          
+        
+
+        
+        // draw them tex coords
+        Vector2D texcoord = h->texcoord;
+
+        // if no texcoords defined, use vertices
+        if(texcoord.x < 0 || texcoord.y < 0) {
+          glTexCoord3dv(&h->vertex()->position.x);
+        } else { // otherwise use defined texcoords
+          // 1.0 - stuff because Blender and OpenGL use left hand and right hand coordinates respectively
+          glTexCoord2d(texcoord.x, 1.0 - texcoord.y);
+        }
+      
         // Draw this vertex.
         Vector3D position = h->vertex()->position;
         glVertex3dv( &position.x );
