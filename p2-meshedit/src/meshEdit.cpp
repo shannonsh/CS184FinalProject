@@ -72,7 +72,7 @@ namespace CGL {
     // Infinite light location.
     // Note: Viewer is in the positive z direction,
     // so we make that component significant.
-    GLfloat light_position[] = {.2, 0.5, 1.0, 0.0};
+    GLfloat light_position[] = {10,10,10,  0.0};
 
     //
     glUseProgram(shaderProgID);
