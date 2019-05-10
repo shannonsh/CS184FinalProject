@@ -77,7 +77,7 @@ void multiLevelShade(vec3 shadecolor) {
     vec3 v_position3 = vertex.xyz;
   
         float intensity;
-        vec3 lightDir = light_position - v_position3;
+        vec3 lightDir = eyePos - v_position3;
         intensity = dot(normalize(lightDir),normalize(normal));
         if (tex_bool) {
             gl_FragColor.xyz = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
