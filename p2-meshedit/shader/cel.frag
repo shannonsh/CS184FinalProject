@@ -90,11 +90,11 @@ void multiLevelShade(vec3 shadecolor) {
         if (maxval == 0.0) maxval = -1.0; 
         //vec3 shadecolor = vec3(1,1,0); //COLOR OF THE SHADOW
 
-
-
-
         for (float i = 1.0/n; i < 1.0; i += 1.0/n) {
             if (intensity < i) gl_FragColor.xyz -= vec3(maxval/n,maxval/n,maxval/n) * shadecolor;
+            gl_FragColor.x = clamp(gl_FragColor.x, 0.0, 1.0);
+            gl_FragColor.y = clamp(gl_FragColor.y, 0.0, 1.0);
+            gl_FragColor.z = clamp(gl_FragColor.z, 0.0, 1.0);
         }
 
         
