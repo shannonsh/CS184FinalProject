@@ -45,23 +45,23 @@ void main()
     }
     if(outputID == 3)
     {
-    multiLevelShade(vec3(0,1,1));
+    multiLevelShade(vec3(0.4,1,1));
     }
     if(outputID == 4)
     {
-    multiLevelShade(vec3(1,0,1));
+    multiLevelShade(vec3(1,0.4,1));
     }
     if(outputID == 5)
     {
-    multiLevelShade(vec3(1,0,0));
+    multiLevelShade(vec3(1,0.4,0.4));
     }
     if(outputID == 6)
     {
-    multiLevelShade(vec3(0,1,0));
+    multiLevelShade(vec3(0.4,1,0.4));
     }
     if(outputID == 7)
     {
-    multiLevelShade(vec3(0,0,1));
+    multiLevelShade(vec3(0.4,0.4,1));
     }
     if(outputID == 8)
     {
