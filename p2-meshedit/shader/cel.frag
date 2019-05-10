@@ -41,27 +41,27 @@ void main()
     }
     if(outputID == 2)
     {
-    multiLevelShade(vec3(1,1,0));
+    multiLevelShade(vec3(0.4,1,1)); //red
     }
     if(outputID == 3)
     {
-    multiLevelShade(vec3(0.4,1,1));
+    multiLevelShade(vec3(0.4,0.4,1)); //yellow
     }
     if(outputID == 4)
     {
-    multiLevelShade(vec3(1,0.4,1));
+    multiLevelShade(vec3(1,0.4,1)); //green
     }
     if(outputID == 5)
     {
-    multiLevelShade(vec3(1,0.4,0.4));
+    multiLevelShade(vec3(1,0.4,0.4)); //cyan
     }
     if(outputID == 6)
     {
-    multiLevelShade(vec3(0.4,1,0.4));
+    multiLevelShade(vec3(1,1,0)); //blue
     }
     if(outputID == 7)
     {
-    multiLevelShade(vec3(0.4,0.4,1));
+    multiLevelShade(vec3(0.4,1,0.4)); //purple
     }
     if(outputID == 8)
     {
