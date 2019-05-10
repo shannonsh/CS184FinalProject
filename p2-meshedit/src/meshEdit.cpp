@@ -1463,16 +1463,16 @@ namespace CGL {
   {
     Matrix4x4 mat = mesh.modelView;
     // draw them outlines
-    glUseProgram(outlineShader);
-    outlineGLSettings();
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-//    glLoadIdentity();
-    glTranslated( mat(0,3), mat(1,3), 0.f );
-    drawFaces(mesh, true);
-    glPopMatrix();
-    glEnable(GL_LIGHTING);
-    mainGLSettings();
+//    glUseProgram(outlineShader);
+//    outlineGLSettings();
+//    glMatrixMode(GL_MODELVIEW);
+//    glPushMatrix();
+////    glLoadIdentity();
+//    glTranslated( mat(0,3), mat(1,3), 0.f );
+//    drawFaces(mesh, true);
+//    glPopMatrix();
+//    glEnable(GL_LIGHTING);
+//    mainGLSettings();
     
     if(shadingMode)
       glUseProgram(shaderProgID);

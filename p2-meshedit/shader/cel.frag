@@ -36,7 +36,7 @@ void main()
     }
     if(outputID == 1)
     {
-        gl_FragColor = vec4(shadePhong(light_position), 1.0);
+        gl_FragColor = vec4(shadePhong(eyePos), 1.0);
         return;
     }
     if(outputID == 2)
@@ -123,9 +123,9 @@ vec3 shadePhong(vec3 lightPos)
     ////////////////////////////////////////
     // TODO: REMOVE BEFORE RELEASING.
     ////////////////////////////////////////
-//  lightPos.z += 10.0;
+  lightPos.z += 10.0;
     // "Constants" to play with for coloring and lighting
-    float p = 10.0; // Used for specular shading
+    float p = 5.0; // Used for specular shading
 //    vec3 lightColor = vec3(175.0 / 251.0, 200.0 / 255.0, 79.0 / 255.0);
   vec3 lightColor = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
 //  vec3 lightColor = vec3(gl_TexCoord[0].s, gl_TexCoord[0].t, 0.0);
@@ -133,6 +133,7 @@ vec3 shadePhong(vec3 lightPos)
 
     if (tex_bool) {
             lightColor = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
+      lightColor = vec3(0.104, 0.333, 0.560);
         } else {
             lightColor = diffuseColor; 
         }
@@ -148,15 +149,16 @@ vec3 shadePhong(vec3 lightPos)
     float distFactor = 1.0 / sqrt(dot(lightVec, lightVec));
 
     // Ambient component
-    vec3 ambient = ambientColor;
+  vec3 ambient = ambientColor;
 
     // Diffuse component (now cel shading)
 //    float diffuseDot = dot(n, lightDir);
 
     // cel shading
     float intensity = dot(lightDir,normalize(normal));
-    if (intensity > 0.4) intensity = 1.0;
-    else if (intensity > 0.3) intensity = 0.5;
+    if (intensity > 0.7) intensity = 1.0;
+    else if (intensity > 0.5) intensity = 0.7;
+    else if (intensity > 0.3) intensity = 0.3;
     else if (intensity > 0.2) intensity = 0.2;
     else intensity = 0.1;
 //    intensity = 1.0; // for debugging
@@ -167,7 +169,7 @@ vec3 shadePhong(vec3 lightPos)
     vec3 specularColor = min(lightColor + 0.5, 1.0);
     float specularDot = dot(n, halfAngle);
     // cel shading
-    if (specularDot > 0.99) specularDot = 1.0;
+    if (specularDot > 0.95) specularDot = 1.0;
     else if (specularDot > 0.5) specularDot = 0.3;
     else if (specularDot > 0.25) specularDot = 0.05;
     else specularDot = 0.01;
