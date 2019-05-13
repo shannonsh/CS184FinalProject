@@ -58,6 +58,10 @@ To get multiple objects to appear on screen, we... <INFO NEEDED>
 
 ### Cross-Hatch Shading
 
+We also implement cross-hatch shading where the shading style looks like it was drawn with a pen or pencil. We implemented this in project 4 since it easily had support for mutli-texture shading. To implement, we followed the paper "Real-Time Hatching" (http://hhoppe.com/hatching.pdf). This paper mainly forcuses on using multi-scale tonal art maps (TAM) and interpolates between them in multiple interesting ways to maintain consistency. Tonal art maps were extracted from <insert source>.
+
+<ADD IMAGES>
+
 ### Interactivity
 
 Most interactivity in our app is done through the use of hotkeys. We extended the project 2 starter code's functionality for this part, taking the `meshEdit.cpp` function `void MeshEdit::key_event( char key )` and adding extra cases for the extra key functionalities. For keyboard events, this function is called, and depending on the input key, the switch statement calls a different handler to perform each action. The numbers 0-9 call different shaders (blinn phong vs diffuse, different shadow colors), the + and - buttons adjust the N level of shading, and the t button enables and disables textures if available.
@@ -69,5 +73,5 @@ We also made some minor adjustments to the camera, it can move left and right an
 ## Team Member Contributions
 
 - Turese Anderson: Contributed multi-level shading, multiple shadow colors, material colors, and some interactivity.
-- Gefen Kohavi
+- Gefen Kohavi: Primarily worked on cross-hatch and other multi-texture shading. Shader debugging for project 2 starter code.
 - Shannon Shih
