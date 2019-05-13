@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+</script>
+
+<title>CS 184 Mesh Editor</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2019</h1>
+<h1 align="middle">Project 4: Cloth Simulator</h1>
+<h2 align="middle">Gefen Kohavi, CS184-aag</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p> In this project, I implemented a cloth simulator as well as a OpenGL shader. I learned that to make a cloth simulation, we need to represent it as a grid of springs. I learned about some of the challenges with cloths such as position constraints and self-collisions. I also learned about how shaders are implemented using OpenGL. Shaders suprisingly have quite a bit of power, all while being super fast. 
+</p>
+
+<h2 align="middle">Part 1: Masses and springs</h2>
+  <p>This part entailed simply constructing the wireframe and initializing the springs.
+  </p>
+  <table>
+    <tr>
+      <td>
+        <img src="part1/p1_all.png" style="width:100%">
+        <figcaption align="middle">All springs</figcaption>
+      </td>
+      <td>
+        <img src="part1/p1_no_shear.png" style="width:100%">
+        <figcaption align="middle">No shear springs</figcaption>
+      </td>
+      <td>
+        <img src="part1/p1_only_shear.png" style="width:100%">
+        <figcaption align="middle">Only shear springs</figcaption>
+      </td>
+    </tr>
+  </table>
+
+<h2 align="middle">Part 2: Simulation via numerical integration</h2>
+  <table>
+    <tr>
+      <td>
+        <img src="part2/p2_def_normal.png" style="width:100%">
+        <figcaption align="middle">Shaded default pinned 4</figcaption>
+      </td>
+      <td>
+        <img src="part2/p2_def_wire.png" style="width:100%">
+        <figcaption align="middle">Wireframe default pinned 4</figcaption>
+      </td>
+    </tr>
+  </table>
+  <p> Changing the spring constant $K_s$ in the Hooke's Law equation is equivalent to changing how much restorative force is generated given some displacement from the resting length. A high $K_s$ will have a high restorative force and cause the mesh to act more rigid and "springy". A low $K_s$ will have low restorative forces and cause the mesh to act less springy and more like water.
+  </p>
+  <table>
+    <tr>
+      <td>
+        <img src="part2/p2_ks50_1.png" style="width:100%">
+        <figcaption align="middle">Ks = 50 img1</figcaption>
+      </td>
+      <td>
+        <img src="part2/p2_ks50_2.png" style="width:100%">
+        <figcaption align="middle">Ks = 50 img2</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="part2/p2_ks50_3.png" style="width:100%">
+        <figcaption align="middle">Ks = 50 img3</figcaption>
+      </td>
+      <td>
+        <img src="part2/p2_ks50_4.png" style="width:100%">
+        <figcaption align="middle">Ks = 50 img4</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="part2/p2_ks50k.png" style="width:100%">
+        <figcaption align="middle">Ks = 50,000 resting</figcaption>
+      </td>
+    </tr>
+  </table>
+  <p> Density affects how much each point mass weighs. A higher density is quite effective at counteracting the spring forces since it takes a longer time to speed up a heavier mass with the same force. A lower density will quickly be affected by the spring forces and reach the resting state quickly.
+  </p>
+  <table>
+    <tr>
+      <td>
+        <img src="part2/p2_d.5.png" style="width:100%">
+        <figcaption align="middle">Density = .5</figcaption>
+      </td>
+      <td>
+        <img src="part2/p2_d5k_1.png" style="width:100%">
+        <figcaption align="middle">Density = 5000 img1</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="part2/p2_d5k_2.png" style="width:100%">
+        <figcaption align="middle">Density = 5000 img2</figcaption>
+      </td>
+      <td>
+        <img src="part2/p2_d5k_3.png" style="width:100%">
+        <figcaption align="middle">Density = 5000 img3</figcaption>
+      </td>
+    </tr>
+  </table>
+  <p> Damping is used in the Verlet integration step and it is used to remove energy from the springs. Ideally the springs should move less and less over time after falling. By using damping to scale each new poistion change, the springs will occillate less and less over time. With high damping, the occillations of the springs quickly go away and we reach the resting state of the spring quickly. With low damping, the springs expand and contract, keeping the energy of the previous movements.
+  </p>
+  <table>
+    <tr>
+      <td>
+        <img src="part2/p2_dp0_1.png" style="width:100%">
+        <figcaption align="middle">Damping ~0, img1</figcaption>
+      </td>
+      <td>
+        <img src="part2/p2_dp0_2.png" style="width:100%">
+        <figcaption align="middle">Damping ~0, img2</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="part2/p2_dp0_3.png" style="width:100%">
+        <figcaption align="middle">Damping ~0, img3</figcaption>
+      </td>
+      <td>
+        <img src="part2/p2_dp0_4.png" style="width:100%">
+        <figcaption align="middle">Damping ~0, img4</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="part2/p2_dp1.png" style="width:100%">
+        <figcaption align="middle">Damping 1, img1</figcaption>
+      </td>
+    </tr>
+  </table>
+<h2 align="middle">Part 3: Handling collisions with other objects</h2>
+  <table>
+      <tr>
+        <td>
+          <img src="part3/p3_sphere_ks500.png" style="width:100%">
+          <figcaption align="middle">Ks = 500</figcaption>
+        </td>
+        <td>
+          <img src="part3/p3_sphere_ks5k.png" style="width:100%">
+          <figcaption align="middle">Ks = 5k (default)</figcaption>
+        </td>
+        <td>
+          <img src="part3/p3_sphere_ks50k.png" style="width:100%">
+          <figcaption align="middle">Ks = 50k</figcaption>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td>
+          <img src="part3/p3_plane1.png" style="width:100%">
+          <figcaption align="middle">Cloth on plane</figcaption>
+        </td>
+        <td>
+          <img src="part3/p3_plane2.png" style="width:100%">
+          <figcaption align="middle">Cloth on plane</figcaption>
+        </td>
+      </tr>
+    </table>
+<h2 align="middle">Part 4: Handling self-collisions</h2>
+  <table>
+      <tr>
+        <td>
+          <img src="part4/p4_1.png" style="width:100%">
+          <figcaption align="middle">t = 1</figcaption>
+        </td>
+        <td>
+          <img src="part4/p4_2.png" style="width:100%">
+          <figcaption align="middle">t = 2</figcaption>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="part4/p4_3.png" style="width:100%">
+          <figcaption align="middle">t = 3</figcaption>
+        </td>
+        <td>
+          <img src="part4/p4_4.png" style="width:100%">
+          <figcaption align="middle">t = 4</figcaption>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="part4/p4_5.png" style="width:100%">
+          <figcaption align="middle">t = 5</figcaption>
+        </td>
+      </tr>
+    </table>
+    <p> Low density alllows the self-collision code to affect the trajectory of pointmasses significantely and results in a nice, smooth decent of the cloth onto the plane. On the other hand, with great density, we see that self-collision just prevents self collion and doesn't change pointmass trajectory too much. As a result, the dense cloth clumps up since once any self collision is fixed, the same point will move in almost the same direction and self-collide in the next time step.
+    </p>
+    <table>
+      <td>
+          <img src="part4/p4_d1_1.png" style="width:100%">
+          <figcaption align="middle">Low density 1, d = 1</figcaption>
+        </td>
+        <td>
+          <img src="part4/p4_d1_2.png" style="width:100%">
+          <figcaption align="middle">Low density 2, d = 1</figcaption>
+        </td>
+    </table>
+    <table>
+      <td>
+          <img src="part4/p4_d100_1.png" style="width:100%">
+          <figcaption align="middle">High density 1, d = 100</figcaption>
+        </td>
+        <td>
+          <img src="part4/p4_d100_2.png" style="width:100%">
+          <figcaption align="middle">High density 2, d = 100</figcaption>
+        </td>
+        <td>
+          <img src="part4/p4_d100_3.png" style="width:100%">
+          <figcaption align="middle">High density 3, d = 100</figcaption>
+        </td>
+    </table>
+    <p> $K_s$ acts very similarly to density. With a high $K_s$, we see that the cloth falls and has a smooth shape throughout the fall. This makes sense since a high restorative force, prevents any one self collision from affecting the overall cloth mesh too much. With a low $K_s$, we see that the result is extreemely noisy and this makes sense as the resorative force does not smooth the self-collision of points across the mesh.
+    </p>
+    <table>
+      <td>
+          <img src="part4/p4_ks500_1.png" style="width:100%">
+          <figcaption align="middle">Low Ks, Ks = 500</figcaption>
+        </td>
+        <td>
+          <img src="part4/p4_ks50k_1.png" style="width:100%">
+          <figcaption align="middle">High Ks, Ks = 50k</figcaption>
+        </td>
+        <td>
+          <img src="part4/p4_ks50k_2.png" style="width:100%">
+          <figcaption align="middle">High Ks, Ks = 50k</figcaption>
+        </td>
+    </table>
+
+<h2 align="middle">Part 5: Shaders</h2>
+  <p> Shaders are a way to render a scene without using ray-tracing. In fact, shaders are similar to project 1 where most of the work being done is rasterization. As a result, this method can be run extreemely fast. We can emulate raytracing effects with shaders. Given a mesh, we know information about an object's normals and position. We can then use attributes like textures or object properties to create cool looking results.
+
+  <br></br>
+
+  The Blinn-Phong Shading Model consists of three parts. First, we have ambient lighting. This is off the assumption that there is some baseline level of lighting in the enviroment that lights the entire object equally. Next, the object is diffusely shaded to represent a lambertian object. This gives a sense of directional lighting and shadows. Finally, specular shading is added to show light highlights and shinyness. Each of these three terms are combined with a weighted average. Specular shading in particular, can act more diffuse or more like a mirror by chaning the exponent value when taking the dot product between the normal vector and the half vector.
+  </p>
+
+  <table>
+    <td>
+        <img src="part5/ambient.png" style="width:100%">
+        <figcaption align="middle">Ambient</figcaption>
+      </td>
+      <td>
+        <img src="part5/diffuse.png" style="width:100%">
+        <figcaption align="middle">Diffuse</figcaption>
+      </td>
+      <td>
+        <img src="part5/specular.png" style="width:100%">
+        <figcaption align="middle">Specular</figcaption>
+      </td>
+  </table>
+  <table>
+    <td>
+        <img src="part5/blinn_phong.png" style="width:100%">
+        <figcaption align="middle">Blinn Phong</figcaption>
+      </td>
+  </table>
+  <table>
+    <td>
+      <img src="part5/my_texture.png" style="width:100%">
+      <figcaption align="middle">My custom texture, paper wad</figcaption>
+    </td>
+    <td>
+      <img src="part5/their_texture.png" style="width:100%">
+      <figcaption align="middle">Campanile texture</figcaption>
+    </td>
+  </table>
+  <table>
+    <td>
+      <img src="part5/mirror1.png" style="width:100%">
+      <figcaption align="middle">Mirror cloth</figcaption>
+    </td>
+    <td>
+      <img src="part5/mirror2.png" style="width:100%">
+      <figcaption align="middle">Mirror sphere</figcaption>
+    </td>
+  </table>
+
+  <p>For bump and displacement mapping, I used texture 3.</p>
+
+  <table>
+    <td>
+      <img src="part5/bump_tex3.png" style="width:100%">
+      <figcaption align="middle">Bump mapping</figcaption>
+    </td>
+    <td>
+      <img src="part5/disp_tex3.png" style="width:100%">
+      <figcaption align="middle">Displacement mapping</figcaption>
+    </td>
+  </table>
+
+  Bump mapping gives a good view of the underlying texture, but it still looks flat. Displacement mapping on the other hand looks like a significant improvment in making the mesh look bumpy. Especially around the cornners, the cloth looks thicker, almost as if the cloth is acutally made of the texture I used.
+
+  <table>
+      <tr>
+        <td>
+          <img src="part5/bump_1616.png" style="width:100%">
+          <figcaption align="middle">Bump -o 16 -a 16</figcaption>
+        </td>
+        <td>
+          <img src="part5/disp_1616.png" style="width:100%">
+          <figcaption align="middle">Displacement -o 16 -a 16</figcaption>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="part5/bump_128128.png" style="width:100%">
+          <figcaption align="middle">Bump -o 128 -a 128</figcaption>
+        </td>
+        <td>
+          <img src="part5/disp_128128.png" style="width:100%">
+          <figcaption align="middle">Displacement -o 128 -a 128</figcaption>
+        </td>
+      </tr>
+    </table>
+
+    The difference between the two is the level of bumpieness in the meshes. -o 16 -a 16 has very coarse bumps which represent a rough approximation of the texture. With -o 128 -a 128, the mesh approximates the texture better but it is noisier. Therefore, to have a good mesh scene, it is good to have a balance between fine-tunned approximation and little noise (coarseness).
+
+</body>
+</html>
