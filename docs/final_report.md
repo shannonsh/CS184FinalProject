@@ -12,7 +12,7 @@ Our project started as a cel shader, but expanded to include all different sorts
 
 |  Hotkeys | Function  | 
 | ---------|---------- | 
-|1|Blinn Phong Shading |
+|1|Cel shading + Blinn Phong Shading |
 |2|Diffuse Shading (red)|
 |3|Diffuse Shading (yellow)|
 |4|Diffuse Shading (green)|
@@ -27,9 +27,7 @@ Our project started as a cel shader, but expanded to include all different sorts
 |-|Remove Shadow Layer (diffuse)|
 
 
-
-
-## Features
+## Technical Approach and Results
 
 ### Outlines
 
@@ -89,15 +87,23 @@ We think the results speak for themselves:
 
 \*Meshes downloaded off the Internet. See below for credits.
 
-### Material Colors and rendering multiple objects at once.
+### Material Colors
 
-To handle material colors in our project, we first had to handle importing them from the DAE file. Thankfully we had a premade file, `collada.cpp`, that did just that. This file passed along the information from the DAE file to the shaders by use of the `glUniform3fv`, making sure the shader had access to the diffuse, ambient, and specular color from the mesh object containing the information parsed from the DAE file, and then in the shaders, if the passed in boolean value that tells the shader when to use the uv texture coordinate as the color of the pixel and when to use the texture's diffuse color is set to diffuse, then the base color of the pixels of the object are set to the diffuse color of that object.
+To handle material colors in our project, we first had to handle importing them from the DAE file. Thankfully we had a premade file, `collada.cpp`, that did just that. This file passed along the information from the DAE file to the shaders by use of the `glUniform3fv`, making sure the shader had access to the diffuse, ambient, and specular color from the mesh object containing the information parsed from the DAE file. This allows the shaders to set the base color of the object to the diffuse color of that object.
 
-To get multiple objects to appear on screen, we... <INFO NEEDED>
+### Multi-mesh support
+
+The default skeleton code for project 2 that we started with supported displaying multiple meshes. However, it didn't support *translating* those multiple meshes to their appropriate locations. We initially tried supporting fancier transformations like rotation and scaling, but this proved to be not compatible with the skeleton code, so we read in the coordinates for transformation from the DAE file and transformed each mesh in the DAE file by its prespecified value.
+
+![two objects](images/final/two-objects.png)
+
+In combination with basic material support, we were able to display more complex, multi-colored objects like the Master Sword from the *Legend of Zelda* series.
+
+![sword](images/final/sword.png)
 
 ### Cross-Hatch Shading
 
-We also implement cross-hatch shading where the shading style looks like it was drawn with a pen or pencil. We implemented this in project 4 since it easily had support for mutli-texture shading. To implement, we followed the paper "Real-Time Hatching" [1]. This paper mainly forcuses on using multi-scale tonal art maps (TAM) and interpolates between them in multiple interesting ways to maintain consistency. For the purposes of our project, we decided to implement single-pass 5-way shading. To do this, we calculate the Blinn-Phong Shading of the object, we can then split this into multiple groups where the nunmber of groups is based on the number of tonal art maps. Once we figure out which group a certain coordinate belongs to, we can assign the color at group G<sub>i</sub> to be `out_color.xyz` = mix(tex<sub>n-i</sub>, tex<sub>n-i-1</sub>, interp(I, i)) where I is the intensity and n is the number of textures. To interpolate, we subtract the intensity by the number of groups `n` times the size of the groups `L`, then we divide the result by the size of each group to get a value that is between zero and one. Tonal art maps were extracted from [2].
+We also implement cross-hatch shading where the shading style looks like it was drawn with a pen or pencil. We implemented this in project 4 since it easily had support for mutli-texture shading. We followed the paper ["Real-Time Hatching"](http://hhoppe.com/hatching.pdf). This paper mainly forcuses on using multi-scale tonal art maps (TAM) and interpolates between them in multiple interesting ways to maintain consistency. For the purposes of our project, we decided to implement single-pass 5-way shading. To do this, we calculate the Blinn-Phong Shading of the object, we can then split this into multiple groups where the nunmber of groups is based on the number of tonal art maps. Once we figure out which group a certain coordinate belongs to, we can assign the color at group G<sub>i</sub> to be `out_color.xyz` = mix(tex<sub>n-i</sub>, tex<sub>n-i-1</sub>, interp(I, i)) where I is the intensity and n is the number of textures. To interpolate, we subtract the intensity by the number of groups `n` times the size of the groups `L`, then we divide the result by the size of each group to get a value that is between zero and one. Tonal art maps were extracted from a [website](https://www.clicktorelease.com/code/cross-hatching/) that demos cross hatching.
 
 | ![Cross hatch shading sphere](images/final/hatch1.png) | ![Cross hatch shading sphere](images/final/hatch2.png) | ![Cross hatch shading sphere](images/final/hatch3.png) |
 | -----------------------|-------------------------- | -------------|
@@ -115,19 +121,28 @@ We also made some minor adjustments to the camera, it can move left and right an
 
 ## References
 [Outline tutorial](https://medium.com/@joshmarinacci/cartoon-outline-effect-6c4e95545537)
+
+[Simple implementation of cel shading](https://pdfs.semanticscholar.org/d17c/efe2c199a87a2ee8e5dc82399a50a8e951c4.pdf)
+
 [Official Collada specification](https://www.khronos.org/files/collada_spec_1_4.pdf)
 
-http://hhoppe.com/hatching.pdf [1] <br></br>
-https://www.clicktorelease.com/code/cross-hatching/ [2]
+[Hatching paper](http://hhoppe.com/hatching.pdf)
+
+[Cross hatching demo](https://www.clicktorelease.com/code/cross-hatching/)
+
 ### 3D Model credits:
+
 [Shield](https://sketchfab.com/3d-models/wooden-shield-the-legend-of-zelda-botw-2c34417be71c472f8da639c86322be9d)
+
 [Companion cube](https://sketchfab.com/3d-models/companion-cube-lowmance-65b8fcbb3f7b4dbdadec7ad90ca48adc)
+
 [Sea dragon](https://sketchfab.com/3d-models/dragon-ver2-81c90e3d51674d8493804a28d1255493)
+
 [Master Sword](https://clara.io/view/c7521d40-22ff-4bdb-85da-67240f4dd357)
 
 ## Team Member Contributions
 
 - Turese Anderson: Contributed multi-level shading, multiple shadow colors, material colors, and some interactivity.
 - Gefen Kohavi: Primarily worked on cross-hatch and other multi-texture shading. Shader debugging for project 2 starter code.
-- Shannon Shih: Wrote intial cel shading code, combined it with Blinn-Phong Shading, added outlines, implemented texture mapping, multi-mesh support, added support for displaying multiple meshes of different colors, created winged dragon model, and converted all 3D models except cow and teapot into DAEs that were compatible with our code (not easy btw).
-- Blender 2.72: The MVP of our group, could handle all the 3D models we threw at it and gave Shannon the hint that there should be a way to map textures onto a model in a more reasonable fashion. 
+- Shannon Shih: Wrote intial cel shading code, combined it with Blinn-Phong Shading, added outlines, implemented texture mapping, multi-mesh support, added support for displaying multiple meshes of different colors, created the winged dragon model, and converted all 3D models except cow and teapot into DAEs that were compatible with our code (not easy btw).
+- Blender 2.72: The MVP of our group, could handle all the 3D models we threw at it and gave us the hint that there should be a way to map textures onto a model in a more reasonable fashion. 
