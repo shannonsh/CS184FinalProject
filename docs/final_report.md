@@ -76,7 +76,7 @@ To get multiple objects to appear on screen, we... <INFO NEEDED>
 
 ### Cross-Hatch Shading
 
-We also implement cross-hatch shading where the shading style looks like it was drawn with a pen or pencil. We implemented this in project 4 since it easily had support for mutli-texture shading. To implement, we followed the paper "Real-Time Hatching" (http://hhoppe.com/hatching.pdf). This paper mainly forcuses on using multi-scale tonal art maps (TAM) and interpolates between them in multiple interesting ways to maintain consistency. For the purposes of our project, we decided to implement single-pass 5-way shading. To do this, we calculate the Blinn-Phong Shading of the object, we can then split this into multiple groups where the nunmber of groups is based on the number of tonal art maps. Once we figure out which group a certain coordinate belongs to, we can assign the color at group G<sub>i</sub> to be `out_color.xyz` = mix(tex<sub>n-i</sub>, tex<sub>n-i-1</sub>, interp(I, i)) where I is the intensity and n is the number of textures. To interpolate, we subtract the intensity by the number of groups `n` times the size of the groups `L`, then we divide the result by the size of each group to get a value that is between zero and one. Tonal art maps were extracted from (https://www.clicktorelease.com/code/cross-hatching/).
+We also implement cross-hatch shading where the shading style looks like it was drawn with a pen or pencil. We implemented this in project 4 since it easily had support for mutli-texture shading. To implement, we followed the paper "Real-Time Hatching" [1]. This paper mainly forcuses on using multi-scale tonal art maps (TAM) and interpolates between them in multiple interesting ways to maintain consistency. For the purposes of our project, we decided to implement single-pass 5-way shading. To do this, we calculate the Blinn-Phong Shading of the object, we can then split this into multiple groups where the nunmber of groups is based on the number of tonal art maps. Once we figure out which group a certain coordinate belongs to, we can assign the color at group G<sub>i</sub> to be `out_color.xyz` = mix(tex<sub>n-i</sub>, tex<sub>n-i-1</sub>, interp(I, i)) where I is the intensity and n is the number of textures. To interpolate, we subtract the intensity by the number of groups `n` times the size of the groups `L`, then we divide the result by the size of each group to get a value that is between zero and one. Tonal art maps were extracted from [2].
 
 | ![Cross hatch shading sphere](images/final/hatch1.png) | ![Cross hatch shading sphere](images/final/hatch2.png) | ![Cross hatch shading sphere](images/final/hatch3.png) |
 | -----------------------|-------------------------- | -------------|
@@ -93,6 +93,9 @@ Most interactivity in our app is done through the use of hotkeys. We extended th
 We also made some minor adjustments to the camera, it can move left and right and up and down (from the original camera perspective only) with use of the WASD keys.
 
 ## References
+
+http://hhoppe.com/hatching.pdf [1]
+https://www.clicktorelease.com/code/cross-hatching/ [2]
 
 ## Team Member Contributions
 
