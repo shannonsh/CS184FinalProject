@@ -17,9 +17,9 @@ Our project started as a cel shader, but expanded to include all different sorts
 
 The cel shading itself was done very simply. We calculated the `intensity` of the light on each pixel of the mesh in a range from 0 to 1 by calculating the dot product of the normalized light direction with the normalized normal of the surface of the mesh at a particular pixel. If the `intensity` is 1, then that means the light direction is perpendicular to the mesh and the light would be at its brightest, while if the face is facing 'away' from the light source, the intensity will be closer to 0. If you set all intensities below a certain threshold to a darker color (in our case, 0.5 is a good baseline), then you can make cell shading that looks like the examples below.
 
-![Cel shaded cow](images/final/celcow.png)
-
-![Cel shaded teapot](images/final/celteapot.png)
+ |  ![Cel shaded cow](images/final/celcow.png) | ![Cel shaded teapot](images/final/celteapot.png)  | 
+| -----------------------|-------------------------- | 
+| Cel shaded cow | Cel shaded teapot | 
 
 ### N-Level Shading and
 
@@ -35,9 +35,7 @@ When N = 4, then the loop will have 3 iterations, for `i = 1/4`, `i = 2/4`, and 
 
 This creates an effect in images like those seen below.
 
-![Low N-levels](images/final/lownlevels.png)
-
-![High N-levels](images/final/highnlevels.png)
+![Low N-levels](images/final/lownlevels.png) |![High N-levels](images/final/highnlevels.png)
 
 ### Different Colored Shadows
 
@@ -60,9 +58,9 @@ To get multiple objects to appear on screen, we... <INFO NEEDED>
 
 We also implement cross-hatch shading where the shading style looks like it was drawn with a pen or pencil. We implemented this in project 4 since it easily had support for mutli-texture shading. To implement, we followed the paper "Real-Time Hatching" (http://hhoppe.com/hatching.pdf). This paper mainly forcuses on using multi-scale tonal art maps (TAM) and interpolates between them in multiple interesting ways to maintain consistency. Tonal art maps were extracted from <insert source>.
 
-![Cross hatch shading sphere](images/final/hatch1.png)
-![Cross hatch shading sphere](images/final/hatch2.png)
-![Cross hatch shading sphere](images/final/hatch3.png)
+| ![Cross hatch shading sphere](images/final/hatch1.png) | ![Cross hatch shading sphere](images/final/hatch2.png) | ![Cross hatch shading sphere](images/final/hatch3.png) |
+| -----------------------|-------------------------- | -------------|
+| Cross hatch shading sphere | Cross hatch shading sphere | Cross hatch shading sphere | 
 
 ### Interactivity
 
