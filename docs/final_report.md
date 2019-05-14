@@ -94,7 +94,7 @@ We also made some minor adjustments to the camera, it can move left and right an
 
 ## References
 
-http://hhoppe.com/hatching.pdf [1]
+http://hhoppe.com/hatching.pdf [1] <br></br>
 https://www.clicktorelease.com/code/cross-hatching/ [2]
 
 ## Team Member Contributions
