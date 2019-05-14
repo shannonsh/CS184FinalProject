@@ -77,7 +77,7 @@ void multiLevelShade(vec3 shadecolor) {
     vec3 v_position3 = vertex.xyz;
   
         float intensity;
-        vec3 lightDir = light_position - v_position3;
+        vec3 lightDir = eyePos - v_position3;
         intensity = dot(normalize(lightDir),normalize(normal));
         if (tex_bool) {
             gl_FragColor.xyz = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
@@ -124,6 +124,7 @@ vec3 shadePhong(vec3 lightPos)
     // TODO: REMOVE BEFORE RELEASING.
     ////////////////////////////////////////
   lightPos.z += 10.0;
+//  lightPos.y += 10.0;
     // "Constants" to play with for coloring and lighting
     float p = 5.0; // Used for specular shading
 //    vec3 lightColor = vec3(175.0 / 251.0, 200.0 / 255.0, 79.0 / 255.0);
@@ -133,7 +134,6 @@ vec3 shadePhong(vec3 lightPos)
 
     if (tex_bool) {
             lightColor = texture2D(u_texture_1, gl_TexCoord[0].st).xyz;
-      lightColor = vec3(0.104, 0.333, 0.560);
         } else {
             lightColor = diffuseColor; 
         }
@@ -156,9 +156,9 @@ vec3 shadePhong(vec3 lightPos)
 
     // cel shading
     float intensity = dot(lightDir,normalize(normal));
-    if (intensity > 0.7) intensity = 1.0;
-    else if (intensity > 0.5) intensity = 0.7;
-    else if (intensity > 0.3) intensity = 0.3;
+    if (intensity > 0.5) intensity = 1.0;
+//    else if (intensity > 0.5) intensity = 0.7;
+    else if (intensity > 0.3) intensity = 0.5;
     else if (intensity > 0.2) intensity = 0.2;
     else intensity = 0.1;
 //    intensity = 1.0; // for debugging

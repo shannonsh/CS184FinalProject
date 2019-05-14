@@ -79,7 +79,7 @@
                 <technique sid="common">
                     <phong>
                         <diffuse>
-                            <color sid="diffuse_effect_rgb">0.48 0.48 0.48 1</color>
+                            <color sid="diffuse_effect_rgb">1.0 1.0 1.0 1</color>
                         </diffuse>
                         <specular>
                             <color sid="specular_effect_rgb">0.2 0.2 0.2 1</color>

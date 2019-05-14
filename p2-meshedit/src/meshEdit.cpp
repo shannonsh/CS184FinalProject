@@ -10,12 +10,6 @@
 
 #include <cmath>
 
-Color ambient;
-Color specular;
-Color diffuse;
-float nvalue = 2.0;
-bool toggletex = false;
-
 
 namespace CGL {
 
@@ -574,7 +568,7 @@ namespace CGL {
 //    glGenTextures(1, &m_gl_texture_4);
 //    glGenTextures(1, &m_gl_cubemap_tex);
     
-    m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/texture_1.png").c_str());
+    m_gl_texture_1_size = load_texture(1, m_gl_texture_1, (m_project_root + "/textures/" + texture_name).c_str());
 //    m_gl_texture_2_size = load_texture(2, m_gl_texture_2, (m_project_root + "/textures/texture_2.png").c_str());
 //    m_gl_texture_3_size = load_texture(3, m_gl_texture_3, (m_project_root + "/textures/texture_3.png").c_str());
 //    m_gl_texture_4_size = load_texture(4, m_gl_texture_4, (m_project_root + "/textures/texture_4.png").c_str());
@@ -1463,16 +1457,17 @@ namespace CGL {
   {
     Matrix4x4 mat = mesh.modelView;
     // draw them outlines
-//    glUseProgram(outlineShader);
-//    outlineGLSettings();
-//    glMatrixMode(GL_MODELVIEW);
-//    glPushMatrix();
-////    glLoadIdentity();
-//    glTranslated( mat(0,3), mat(1,3), 0.f );
-//    drawFaces(mesh, true);
-//    glPopMatrix();
-//    glEnable(GL_LIGHTING);
-//    mainGLSettings();
+    if(drawOutlines) {
+      glUseProgram(outlineShader);
+      outlineGLSettings();
+      glMatrixMode(GL_MODELVIEW);
+      glPushMatrix();
+      glTranslated( mat(0,3), mat(1,3), 0.f );
+      drawFaces(mesh, true);
+      glPopMatrix();
+      glEnable(GL_LIGHTING);
+      mainGLSettings();
+    }
     
     if(shadingMode)
       glUseProgram(shaderProgID);

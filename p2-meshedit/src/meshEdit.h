@@ -232,8 +232,18 @@ class MeshEdit : public Renderer {
   GLuint shaderProgID;
   GLuint outlineShader;
   
+  /**** SETTINGS FOR DISPLAY ****/
+  // Relative path to textures from executable
+  std::string m_project_root = "../../"; // change to ../ if you're not using Xcode
+  bool drawOutlines = true; // if drawing seadragon, disable outlines
+  float nvalue = 2.0;
+  bool toggletex = false;
+//  std::string texture_name = "seadragon.png";
+//  std::string texture_name = "shield.png";
+  std::string texture_name = "companion-cube.png";
+  
+  
   // OpenGL textures
-  std::string m_project_root = "../../";
   Vector3D m_gl_texture_1_size;
   Vector3D m_gl_texture_2_size;
   Vector3D m_gl_texture_3_size;
