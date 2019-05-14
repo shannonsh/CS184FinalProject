@@ -9,6 +9,19 @@
 
 Our project started as a cel shader, but expanded to include all different sorts of artistic rendering techniques. We implemented the cel shading style, primarily, which involves one or more layers of blocky shadows and possibly highlights, as well as thick outlines around our rendered models, in a way that emulates cartoony 2D rendering. We also implemented texture mapping and material handling for the DAE 3D model files we worked with, so we could render the characters more completely. We also implemented interactive components to our GUI, allowing users to move the camera around, change the color of the cel shading shadows, and also adjust the amount of shadow "layers" in a cel shaded image themselves, to see which one looks the best for a certain model.
 
+
+|  Hotkeys | Function  | 
+| ---------|---------- | 
+|1|Blinn Phong Shading |
+|2-9|Diffuse Shading (different colors)|
+|WASD|Move Camera|
+|T|Toggle Textures|
+|+|Add Shadow Layer (diffuse)|
+|-|Remove Shadow Layer (diffuse)|
+
+
+
+
 ## Features
 
 ### Outlines
