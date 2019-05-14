@@ -5,6 +5,9 @@
 - Gefen Kohavi
 - Shannon Shih
 
+## Video
+<iframe width="560" height="315" src="https://www.youtube.com/embed/MhSdYa3CqmA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Summary
 
 Our project started as a cel shader, but expanded to include all different sorts of artistic rendering techniques. We primarily implemented the cel shading style, which involves one or more layers of blocky shadows and highlights, as well as thick outlines drawn around our rendered models in a way that emulates cartoony 2D drawings. We also implemented texture mapping and material handling for the DAE 3D model files we worked with, so we could render the characters more completely. We also implemented interactive components to our GUI, allowing users to move the camera around, change the color of the cel shading shadows, and also adjust the amount of shadow "layers" in a cel shaded image themselves, to see which one looks the best for a certain model.
@@ -145,7 +148,7 @@ We also made some minor adjustments to the camera, it can move left and right an
 
 - Turese Anderson: Contributed multi-level shading, multiple shadow colors, material colors, and some interactivity.
 - Gefen Kohavi: Primarily worked on cross-hatch and other multi-texture shading. Shader debugging for project 2 starter code.
-- Shannon Shih: Wrote intial cel shading code, combined it with Blinn-Phong Shading, added outlines, implemented texture mapping, multi-mesh support, added support for displaying multiple meshes of different colors, created the winged dragon model, and converted all 3D models except cow and teapot into DAEs that were compatible with our code (not easy btw).
+- Shannon Shih: Wrote intial cel shading code, combined it with Blinn-Phong Shading, added outlines, implemented texture mapping, multi-mesh support, added support for displaying multiple meshes of different colors, created the winged dragon model, and converted all 3D models except cow and teapot into DAEs that were compatible with our code (not easy btw). Made progress video and edited final project video.
 - Blender 2.72: The MVP of our group, could handle all the 3D models we threw at it and gave us the hint that there should be a way to map textures onto a model in a more reasonable fashion. 
 
 ## Running our code
