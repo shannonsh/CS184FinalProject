@@ -7,7 +7,7 @@
 
 ## Summary
 
-Our project started as a cel shader, but expanded to include all different sorts of artistic rendering techniques. We implemented the cel shading style, primarily, which involves one or more layers of blocky shadows and possibly highlights, as well as thick outlines around our rendered models, in a way that emulates cartoony 2D rendering. We also implemented texture mapping and material handling for the DAE 3D model files we worked with, so we could render the characters more completely. We also implemented interactive components to our GUI, allowing users to move the camera around, change the color of the cel shading shadows, and also adjust the amount of shadow "layers" in a cel shaded image themselves, to see which one looks the best for a certain model.
+Our project started as a cel shader, but expanded to include all different sorts of artistic rendering techniques. We primarily implemented the cel shading style, which involves one or more layers of blocky shadows and highlights, as well as thick outlines drawn around our rendered models in a way that emulates cartoony 2D drawings. We also implemented texture mapping and material handling for the DAE 3D model files we worked with, so we could render the characters more completely. We also implemented interactive components to our GUI, allowing users to move the camera around, change the color of the cel shading shadows, and also adjust the amount of shadow "layers" in a cel shaded image themselves, to see which one looks the best for a certain model.
 
 
 |  Hotkeys | Function  | 
@@ -33,19 +33,29 @@ Our project started as a cel shader, but expanded to include all different sorts
 
 ### Outlines
 
-### Cel Shading
+One problem with cel shading is that its large blocky colors can make objects look flat so that it is hard to distinguish their shape and other features. One solution artists use is to draw outlines, which we have implemented here. To draw the outline, we initially tried just taking the dot product between the camera and the normal, and if the angle between the camera and the normal was close to perpendicular, we would render the fragment as black. However, this turned out to not work so well because the cases where this was true was too rare to draw a consistent outline. 
+
+Instead, we used a method suggested by this [website](https://medium.com/@joshmarinacci/cartoon-outline-effect-6c4e95545537), which involves enlarging the mesh along the normal direction, culling the front faces, and coloring the mesh black. This resulted in a much more consistent outline. 
+
+ |  ![Naive outline](images/final/cow-outline.png) | ![Cel shaded teapot](images/final/teapot-outline.png)  | 
+| -----------------------|-------------------------- | 
+| Cow outline | Teapot outline | 
+
+As a side note, we did find and consider other methods to draw outlines, including converting thee render to a texture and running an edge detection kernel over it to determine where the outlines were. However, we decided that the other methods were too difficult to implement due to our inexperience with OpenGL and GLSL. And as you will find out below, textures by themselves are hard enough to work with, so avoiding this method was probably the right decision.
+
+### Cel Shading and Blinn-Phong Shading
 
 The cel shading itself was done very simply. We calculated the `intensity` of the light on each pixel of the mesh in a range from 0 to 1 by calculating the dot product of the normalized light direction with the normalized normal of the surface of the mesh at a particular pixel. If the `intensity` is 1, then that means the light direction is perpendicular to the mesh and the light would be at its brightest, while if the face is facing 'away' from the light source, the intensity will be closer to 0. If you set all intensities below a certain threshold to a darker color (in our case, 0.5 is a good baseline), then you can make cell shading that looks like the examples below.
 
- |  ![Cel shaded cow](images/final/celcow.png) | ![Cel shaded teapot](images/final/celteapot.png)  | 
+ |  ![Cel shaded dragon](images/final/cel-shaded-dragon.png) | ![Cel shaded teapot](images/final/cel-shaded-teapot.png)  | 
 | -----------------------|-------------------------- | 
-| Cel shaded cow | Cel shaded teapot | 
+| Cel shaded dragon | Cel shaded teapot | 
 
 ### N-Level Shading and
 
 To achieve N-Level shading, we expanded upon our cel shading algorithm to interpolate between the values of the shadow's color and the color of the model.
 
-![code snipper for N-Level Shading](images/final/nlayerscode.png)
+![code snippet for N-Level Shading](images/final/nlayerscode.png)
 
 As you can see above, we did this by adding the shadow (represented by `shadecolor`) to `gl_FragColor`, which is the color of the pixel that we are shading. As i takes n steps to move up, a wider range of intensities is eligible to be shaded each iteration of the loop by subtracting the (inverse of the) shadow color. `maxval` represents the maximum value of the shadow's colors. For example, if `shadecolor = - vec3(0.5, 0.4, 0.3)`, then `maxval` will be 0.5.
 
@@ -65,14 +75,25 @@ We also added the ability to shade with one of multiple different colors of shad
 
 ### Texture Mapping
 
+After much difficulty, we implemented full support for mapping single textures onto a mesh using the UV coordinates provided in the DAE file. Our initial prototype converted vertex coordinates from 3D to 2D and used them as UV coordinates. While this did successfully display the texture on meshes but did not correctly map objects with prespecified textures like the shield and the Companion Cube.
+
+![bad cube texture](images/final/bad-cube-texture.png)
+
+However, Blender could somehow map the texture onto the object correctly, which indicated to us that the dae file came prespecified with UV coordinates that Blender knew how to map correctly to vertices. Attempts to directly correlate each vertex to a single UV coordinate failed spectacularly until TA James Fong gave us some suggestions, including using a debug texture with a plane so we could see what was wrong. By inspecting the much more simplified DAE file in combination with reading the [official specifications](https://www.khronos.org/files/collada_spec_1_4.pdf) for DAE files, we were able to quickly figure out the weird(ish) way DAE files represented UV coordinates and how they mapped to vertices (spoiler: they don't). We won't bore you with the details, but suffice to say UV coordinates can be mapped one-to-one with halfedges and using the halfedges we were able to flawlessly wrap the texture around the mesh.
+
+We think the results speak for themselves:
+
+![Freakin awesome dragon](images/final/seadragon.png)
+
+![companion cube](images/final/companion-cube.png) |![shield](images/final/shield.png)
+
+\*Meshes downloaded off the Internet. See below for credits.
 
 ### Material Colors and rendering multiple objects at once.
 
 To handle material colors in our project, we first had to handle importing them from the DAE file. Thankfully we had a premade file, `collada.cpp`, that did just that. This file passed along the information from the DAE file to the shaders by use of the `glUniform3fv`, making sure the shader had access to the diffuse, ambient, and specular color from the mesh object containing the information parsed from the DAE file, and then in the shaders, if the passed in boolean value that tells the shader when to use the uv texture coordinate as the color of the pixel and when to use the texture's diffuse color is set to diffuse, then the base color of the pixels of the object are set to the diffuse color of that object.
 
 To get multiple objects to appear on screen, we... <INFO NEEDED>
-
-### Blinn-Phong Shading
 
 ### Cross-Hatch Shading
 
@@ -93,12 +114,20 @@ Most interactivity in our app is done through the use of hotkeys. We extended th
 We also made some minor adjustments to the camera, it can move left and right and up and down (from the original camera perspective only) with use of the WASD keys.
 
 ## References
+[Outline tutorial](https://medium.com/@joshmarinacci/cartoon-outline-effect-6c4e95545537)
+[Official Collada specification](https://www.khronos.org/files/collada_spec_1_4.pdf)
 
 http://hhoppe.com/hatching.pdf [1] <br></br>
 https://www.clicktorelease.com/code/cross-hatching/ [2]
+### 3D Model credits:
+[Shield](https://sketchfab.com/3d-models/wooden-shield-the-legend-of-zelda-botw-2c34417be71c472f8da639c86322be9d)
+[Companion cube](https://sketchfab.com/3d-models/companion-cube-lowmance-65b8fcbb3f7b4dbdadec7ad90ca48adc)
+[Sea dragon](https://sketchfab.com/3d-models/dragon-ver2-81c90e3d51674d8493804a28d1255493)
+[Master Sword](https://clara.io/view/c7521d40-22ff-4bdb-85da-67240f4dd357)
 
 ## Team Member Contributions
 
 - Turese Anderson: Contributed multi-level shading, multiple shadow colors, material colors, and some interactivity.
 - Gefen Kohavi: Primarily worked on cross-hatch and other multi-texture shading. Shader debugging for project 2 starter code.
-- Shannon Shih
+- Shannon Shih: Wrote intial cel shading code, combined it with Blinn-Phong Shading, added outlines, implemented texture mapping, multi-mesh support, added support for displaying multiple meshes of different colors, created winged dragon model, and converted all 3D models except cow and teapot into DAEs that were compatible with our code (not easy btw).
+- Blender 2.72: The MVP of our group, could handle all the 3D models we threw at it and gave Shannon the hint that there should be a way to map textures onto a model in a more reasonable fashion. 
