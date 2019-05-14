@@ -12,20 +12,21 @@ Our project started as a cel shader, but expanded to include all different sorts
 
 |  Hotkeys | Function  | 
 | ---------|---------- | 
-|1|Cel shading + Blinn Phong Shading |
-|2|Diffuse Shading (red)|
-|3|Diffuse Shading (yellow)|
-|4|Diffuse Shading (green)|
-|5|Diffuse Shading (teal)|
-|6|Diffuse Shading (blue)|
-|7|Diffuse Shading (hot pink)|
-|8|Diffuse Shading (gray)|
-|9|Diffuse Shading (black)|
-|WASD|Move Camera|
-|T|Toggle Textures|
-|+|Add Shadow Layer (diffuse)|
-|-|Remove Shadow Layer (diffuse)|
+|<kbd>1</kbd>|Cel shading + Blinn Phong Shading |
+|<kbd>2</kbd>|Diffuse Shading (red)|
+|<kbd>3</kbd>|Diffuse Shading (yellow)|
+|<kbd>4</kbd>|Diffuse Shading (green)|
+|<kbd>5</kbd>|Diffuse Shading (teal)|
+|<kbd>6</kbd>|Diffuse Shading (blue)|
+|<kbd>7</kbd>|Diffuse Shading (hot pink)|
+|<kbd>8</kbd>|Diffuse Shading (gray)|
+|<kbd>9</kbd>|Diffuse Shading (black)|
+|<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>|Move Camera|
+|<kbd>T</kbd>|Toggle Textures|
+|<kbd>+</kbd>|Add Shadow Layer (diffuse)|
+|<kbd>-</kbd>|Remove Shadow Layer (diffuse)|
 
+See section below for additional configuration settings
 
 ## Technical Approach and Results
 
@@ -146,3 +147,73 @@ We also made some minor adjustments to the camera, it can move left and right an
 - Gefen Kohavi: Primarily worked on cross-hatch and other multi-texture shading. Shader debugging for project 2 starter code.
 - Shannon Shih: Wrote intial cel shading code, combined it with Blinn-Phong Shading, added outlines, implemented texture mapping, multi-mesh support, added support for displaying multiple meshes of different colors, created the winged dragon model, and converted all 3D models except cow and teapot into DAEs that were compatible with our code (not easy btw).
 - Blender 2.72: The MVP of our group, could handle all the 3D models we threw at it and gave us the hint that there should be a way to map textures onto a model in a more reasonable fashion. 
+
+## Running our code
+Beyond the interactive components documented above, our code also support changing several settings. The most interactive (and non-interactive) settings can be changed in `p2-meshedit/src/meshEdit.h:235`. Here are some example configurations we used to display some of the images shown above. Command line argument paths are given assuming user is running Xcode, but really should be the relative path to the DAE file in question.
+
+Teapot outline: 
+
+|  Setting | Value  | 
+| ---------|---------- | 
+| Command line argument: | `./build ../../dae/teapot.dae` |
+| `drawOutlines` | `true` |
+| `nvalue` | `0.0` |
+| `toggletex` | `false` |
+| Keyboard button to press | <kbd>2</kbd> | 
+| Output: | ![Cel shaded teapot](images/final/teapot-outline.png) |
+
+Cel shaded teapot: 
+
+|  Setting | Value  | 
+| ---------|---------- | 
+| Command line argument: | `./build ../../dae/teapot.dae` |
+| `drawOutlines` | `true` |
+| `nvalue` | `2.0` |
+| `toggletex` | `false` |
+| Keyboard button to press | <kbd>1</kbd> |
+| Output: | ![Cel shaded teapot](images/final/cel-shaded-teapot.png) | 
+
+Purple teapot: 
+
+|  Setting | Value  | 
+| ---------|---------- | 
+| Command line argument: | `./build ../../dae/purpleteapot.dae` |
+| `drawOutlines` | `true` |
+| `nvalue` | `2.0` |
+| `toggletex` | `false` |
+| Keyboard button to press | <kbd>2</kbd>, plus <kbd>+</kbd> and <kbd>-</kbd> as appropriate | 
+| Output: | ![Cel shaded teapot](images/final/highnlevels.png) |
+
+Colored cows: 
+
+|  Setting | Value  | 
+| ---------|---------- | 
+| Command line argument: | `./build ../../dae/cow.dae` |
+| `drawOutlines` | `true` |
+| `nvalue` | `4.0` |
+| `toggletex` | `false` |
+| Keyboard button to press | <kbd>2-9</kbd> | 
+| Output: | ![Cel shaded teapot](images/final/multicolors.png) |
+
+Sea dragon: 
+
+|  Setting | Value  | 
+| ---------|---------- | 
+| Command line argument: | `./build ../../dae/seadragon.dae` |
+| `drawOutlines` | `false` |
+| `nvalue` | `2.0` |
+| `toggletex` | `true` |
+| `texture_name` | `seadragon.png` |
+| Keyboard button to press | <kbd>8</kbd> | 
+| Output: | ![Cel shaded teapot](images/final/seadragon.png) |
+
+Master Sword: 
+
+|  Setting | Value  | 
+| ---------|---------- | 
+| Command line argument: | `./build ../../dae/mastersword.dae` |
+| `drawOutlines` | `true` |
+| `nvalue` | `2.0` |
+| `toggletex` | `false` |
+| Keyboard button to press | <kbd>1</kbd>, then zoom out | 
+| Output: | ![Cel shaded teapot](images/final/sword.png) |
