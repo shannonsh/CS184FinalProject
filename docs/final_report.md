@@ -56,7 +56,7 @@ To get multiple objects to appear on screen, we... <INFO NEEDED>
 
 ### Cross-Hatch Shading
 
-We also implement cross-hatch shading where the shading style looks like it was drawn with a pen or pencil. We implemented this in project 4 since it easily had support for mutli-texture shading. To implement, we followed the paper "Real-Time Hatching" (http://hhoppe.com/hatching.pdf). This paper mainly forcuses on using multi-scale tonal art maps (TAM) and interpolates between them in multiple interesting ways to maintain consistency. Tonal art maps were extracted from <insert source>.
+We also implement cross-hatch shading where the shading style looks like it was drawn with a pen or pencil. We implemented this in project 4 since it easily had support for mutli-texture shading. To implement, we followed the paper "Real-Time Hatching" (http://hhoppe.com/hatching.pdf). This paper mainly forcuses on using multi-scale tonal art maps (TAM) and interpolates between them in multiple interesting ways to maintain consistency. Tonal art maps were extracted from (https://www.clicktorelease.com/code/cross-hatching/).
 
 | ![Cross hatch shading sphere](images/final/hatch1.png) | ![Cross hatch shading sphere](images/final/hatch2.png) | ![Cross hatch shading sphere](images/final/hatch3.png) |
 | -----------------------|-------------------------- | -------------|
