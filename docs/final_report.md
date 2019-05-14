@@ -13,7 +13,14 @@ Our project started as a cel shader, but expanded to include all different sorts
 |  Hotkeys | Function  | 
 | ---------|---------- | 
 |1|Blinn Phong Shading |
-|2-9|Diffuse Shading (different colors)|
+|2|Diffuse Shading (red)|
+|3|Diffuse Shading (yellow)|
+|4|Diffuse Shading (green)|
+|5|Diffuse Shading (teal)|
+|6|Diffuse Shading (blue)|
+|7|Diffuse Shading (hot pink)|
+|8|Diffuse Shading (gray)|
+|9|Diffuse Shading (black)|
 |WASD|Move Camera|
 |T|Toggle Textures|
 |+|Add Shadow Layer (diffuse)|
