@@ -62,6 +62,10 @@ We also implement cross-hatch shading where the shading style looks like it was 
 | -----------------------|-------------------------- | -------------|
 | Cross hatch shading sphere | Cross hatch shading sphere | Cross hatch shading sphere | 
 
+| ![Cross hatch shading sphere](images/final/dots.png) | ![Cross hatch shading sphere](images/final/abstract.png)|
+| -----------------------|-------------|
+| Dot shading sphere | Abstract shading sphere | 
+
 ### Interactivity
 
 Most interactivity in our app is done through the use of hotkeys. We extended the project 2 starter code's functionality for this part, taking the `meshEdit.cpp` function `void MeshEdit::key_event( char key )` and adding extra cases for the extra key functionalities. For keyboard events, this function is called, and depending on the input key, the switch statement calls a different handler to perform each action. The numbers 0-9 call different shaders (blinn phong vs diffuse, different shadow colors), the + and - buttons adjust the N level of shading, and the t button enables and disables textures if available.
