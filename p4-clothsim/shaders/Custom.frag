@@ -23,13 +23,12 @@ out vec4 out_color;
 float level = 1. / 5.;
 
 float interp(float I, float n) {
-	return (1./level) * (I - n * level);
+	return (I - n * level) / level;
 }
 
 void main() {
-  // YOUR CODE HERE
-  
-  // (Placeholder code. You will want to replace it.)
+	// To change textures, copy images from a different folder in the textures folder
+
 	vec3 tex1 = texture(u_texture_1, v_uv).xyz;
 	vec3 tex2 = texture(u_texture_2, v_uv).xyz;
 	vec3 tex3 = texture(u_texture_3, v_uv).xyz;
@@ -46,9 +45,6 @@ void main() {
 					+ IR2 * pow(max(0, dot(v_normal.xyz, h)), 20);
 	phong = clamp(phong, vec3(0.), vec3(1.));
 	float I = length(phong);
-	// if (I > 0 && I < level)
-	// 	 out_color.xyz = mix(tex6, tex5, interp(I, 0));
-	// else
 	if (I <= 1.*level)
 		out_color.xyz = mix(tex5, tex4, interp(I, 0));
 	else if (I <= 2.*level)
@@ -58,6 +54,7 @@ void main() {
 	else if (I <= 4.*level)
 		out_color.xyz = mix(tex2, tex1, interp(I, 3));
 	else
+		// Here we mix with white, the birght highlight
 		out_color.xyz = mix(tex1, vec3(1.), interp(I, 4));
 	out_color.a = 1;
 }
