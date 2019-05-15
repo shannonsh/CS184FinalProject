@@ -53,7 +53,7 @@ The cel shading itself was done very simply. We calculated the `intensity` of th
 | -----------------------|-------------------------- | 
 | Cel shaded dragon | Cel shaded teapot | 
 
-### N-Level Shading and
+### N-Level Shading
 
 To achieve N-Level shading, we expanded upon our cel shading algorithm to interpolate between the values of the shadow's color and the color of the model.
 
@@ -67,7 +67,7 @@ When N = 4, then the loop will have 3 iterations, for `i = 1/4`, `i = 2/4`, and 
 
 This creates an effect in images like those seen below.
 
-![Low N-levels](images/final/lownlevels.png) |![High N-levels](images/final/highnlevels.png)
+![Low N-levels](images/final/lownlevels.png) ![High N-levels](images/final/highnlevels.png)
 
 ### Different Colored Shadows
 
